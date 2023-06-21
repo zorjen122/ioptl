@@ -45,7 +45,6 @@ public:
     }
     #endif
 
-    //* ERROR
     CCC_CONSTEXPR_CXX17 void deallocate(pointer __ptr, const size_type __n) {
         if (__ptr != nullptr) ::operator delete(__ptr);
     }
