@@ -1,0 +1,25 @@
+对性能的优化：
+    对某些case的判断，1- 保证该case是可以noexcept的，从而让编译器对性能进行优化，
+                       ex: noexcept(is_construct_element，is_destrctor_element...).
+                    2- 通过traits-destrcutor判断是否需要析构，减少call-time,ex：has_trivial_destructor.
+    通过type-traits手段来重载函数，让不同iterator type有着对应的函数，避免代码复杂化.
+
+结构设计：
+  <Traits,Allocator>:
+    class-traits的存在大致是3点：class-type重载；减少alloc的其他函数，只存在普遍的函数；必要的安全（比如allocator_traits的合理alloc）.
+    type-traits的存在是由于class-obj函数的重载（各个iterator_tag是继承is-a关系）实现需要class-obj的函数签名，因为重载的关系可以存在
+                包含关系的全类型，而包含关系的全类型可能和子类型所需要函数的return-type是不同的（ pointer/const pointer）
+                使得class-obj type需要class-obj type的内置类型别名，才能typename T::types，
+                这个内置类型别名就是class-obj下的typedef type（ value_type/reference ... ）.
+    allocator_traits，但通常用到的是std::allocator，traits的设计只是为了让用户的能够在容器上设置自己的分配器，保证其安全性,Type-Check.
+    iterator_traits，为不同函数签名iteraotr-type进行重载的实现需要.
+
+  <> list::merge maybe can use std::move do it.
+
+
+TODO:
+  *List/Deque Function*
+  Tree/Map Container
+  Function/Bind
+  Auto-Poiner
+  some-arithmtic

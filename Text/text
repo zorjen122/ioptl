@@ -1,0 +1,197 @@
+// 134 line
+
+#if __cplusplus < 201703L
+
+template <class _InputIterator>
+inline typename iterator_traits<_InputIterator>::difference_type
+__distance(_InputIterator __frist, _InputIterator __last, input_iterator_tag)
+{
+    typename iterator_traits<_InputIterator>::difference_type __n = 0;
+    while (__frist != __last) {
+        ++__frist; ++__n;
+    }
+    return __n;
+}
+
+template <class _RandomAccessIterator>
+inline typename iterator_traits<_RandomAccessIterator>::difference_type
+__distance(_RandomAccessIterator __frist, _RandomAccessIterator __last,
+    random_access_iterator_tag) {
+    __CCC_REQUIRES(_RandomAccessIterator, _RandomAccessIterator);
+    return __last - __frist;
+}
+
+template <class _InputIterator>
+inline typename iterator_traits<_InputIterator>::difference_type
+distance(_InputIterator __frist, _InputIterator __last) {
+    typedef typename iterator_traits<_InputIterator>::iterator_category
+        _Category;
+    __CCC_REQUIRES(_InputIterator, _InputIterator);
+    return __distance(__frist, __last, _Category());
+}
+
+template <class _Tp, class _Distance>
+inline input_iterator_tag
+iterator_category(const input_iterator<_Tp, _Distance>&)
+{
+    return input_iterator_tag();
+}
+
+inline output_iterator_tag iterator_category(const output_iterator&)
+{
+    return output_iterator_tag();
+}
+
+template <class _Tp, class _Distance>
+inline forward_iterator_tag
+iterator_category(const forward_iterator<_Tp, _Distance>&)
+{
+    return forward_iterator_tag();
+}
+
+template <class _Tp, class _Distance>
+inline bidirectional_iterator_tag
+iterator_category(const bidirectional_iterator<_Tp, _Distance>&)
+{
+    return bidirectional_iterator_tag();
+}
+
+template <class _Tp, class _Distance>
+inline random_access_iterator_tag
+iterator_category(const random_access_iterator<_Tp, _Distance>&)
+{
+    return random_access_iterator_tag();
+}
+template <class _InputIter, class _Distance>
+inline void __advance(_InputIter& __i, _Distance __n, input_iterator_tag) {
+    while (__n--) ++__i;
+}
+
+template <class _BidirectionalIterator, class _Distance>
+inline void __advance(_BidirectionalIterator& __i, _Distance __n,
+    bidirectional_iterator_tag) {
+    __CCC_REQUIRES(_BidirectionalIterator, _BidirectionalIterator);
+    if (__n >= 0)
+        while (__n--) ++__i;
+    else
+        while (__n++) --__i;
+}
+
+
+template <class _RandomAccessIterator, class _Distance>
+inline void __advance(_RandomAccessIterator& __i, _Distance __n,
+    random_access_iterator_tag) {
+    __CCC_REQUIRES(_RandomAccessIterator, _RandomAccessIterator);
+    __i += __n;
+}
+
+template <class _InputIterator, class _Distance>
+inline void advance(_InputIterator& __i, _Distance __n) {
+    __CCC_REQUIRES(_InputIterator, _InputIterator);
+    __advance(__i, __n, iterator_category(__i));
+}
+#elif __cplusplus < 202003L
+// template <class = Enable_if_iterator_category<input_iterator_tag, input_iterator_tag>
+// , class _Distance>
+// constexpr void __advance(_InputIter& __i, _Distance __n) { while (__n--) ++__i; }
+#endif
+
+#define _CONTAIER_ITER_POSITION(TYPE,RETURN_TYPE,ITER_POS)                  \
+    template< class T>                                                      \
+    CCC_CONSTEXPR RETURN_TYPE rbegin(_TYPE __rhs) {                         \
+    return __rhs.ITER_POS();                                                \
+}                                                                           \
+
+
+CCC_CONSTEXPR_CXX17 void clear() { destroy(V_start, V_finish); }
+
+
+template<class _P, class... _Args>
+CCC_CONSTEXPR_CXX17 void emplace(_P* const __ptr, _Args&&... __args) {
+
+    const size_type u = sizeof...(__args);
+    const size_type n = size() > u ? 2 * size() + (u >> 4)
+        : 2 * size() + u;
+
+    iterator new_start = F_allocate(n);
+    iterator new_finish = new_start;
+
+    new_finish = uninitialized_copy(V_start, __ptr, new_start);
+    construct(new_finish, FVstd::forward<_Args>(__args)...);
+    new_finish += u;
+
+    destroy(begin(), end());
+    F_allocate(V_start, static_cast<size_type>(V_end_of_storage - V_start));
+
+    V_start = new_start;
+    V_finish = new_finish;
+    V_end_of_storage = new_start + n;
+}
+
+//* constexpr inline is equivalent for type is void
+template<class... _Args>
+CCC_CONSTEXPR_CXX17
+#if CCC_VERSION > 14 
+reference
+#else
+void
+#endif
+emplace_back(_Args&&... __args) {
+    size_type n = size() + sizeof...(__args);
+    size_type esn = sizeof(V_end_of_storage) / sizeof(value_type);
+    if (n < esn) {
+        construct(V_finish, __args...);
+        ++V_finish;
+    }
+    else
+        emplace_back_slow_path(__args...);
+
+    #if CCC_VERSION > 14
+
+    return back();
+
+    #endif
+}
+
+
+
+
+
+
+
+
+
+#if CCC_VERSION >= 20 
+template<class _Ty, class _Tp>
+using io_unary_inheritance_function = __null_function<_Ty, _Tp >;
+template<class _Ty, class _Tp, class _R>
+using io_binary_inheritance_function = __null_function<_Ty, _Tp, >;
+#else
+template<class _Ty, class _R>
+using io_unary_inheritance_function = unary_function<_Ty, _R>
+template<class _Ty, class _Tp, class _R>
+using io_binary_inheritance_function = binary_function<_Ty, _Tp, _R>;
+#endif
+
+
+UNARY_ARITHMETIC_FUNC_OP(negate, io_unary_inheritance_function, bool, -);
+UNARY_ARITHMETIC_FUNC_OP(logical_not, io_unary_inheritance_function, bool, !);
+
+
+BINARY_ARITHMETIC_FUNC_OP(plus, io_binary_inheritance_function, _Ty, +);
+BINARY_ARITHMETIC_FUNC_OP(minus, io_binary_inheritance_function, _Ty, -);
+BINARY_ARITHMETIC_FUNC_OP(mult, io_binary_inheritance_function, _Ty, *);
+BINARY_ARITHMETIC_FUNC_OP(mod, io_binary_inheritance_function, _Ty, %);
+BINARY_ARITHMETIC_FUNC_OP(divides, io_binary_inheritance_function, _Ty, / );
+
+
+BINARY_ARITHMETIC_FUNC_OP(greater, io_binary_inheritance_function, bool, > );
+BINARY_ARITHMETIC_FUNC_OP(less, io_binary_inheritance_function, bool, < );
+BINARY_ARITHMETIC_FUNC_OP(greater_equal, io_binary_inheritance_function, bool, >= );
+BINARY_ARITHMETIC_FUNC_OP(less_equal, io_binary_inheritance_function, bool, <= );
+
+
+BINARY_ARITHMETIC_FUNC_OP(logical_and, io_binary_inheritance_function, bool, &&);
+BINARY_ARITHMETIC_FUNC_OP(logical_or, io_binary_inheritance_function, bool, || );
+BINARY_ARITHMETIC_FUNC_OP(equal_to, io_binary_inheritance_function, bool, == );
+BINARY_ARITHMETIC_FUNC_OP(unequal_to, io_binary_inheritance_function, bool, != );

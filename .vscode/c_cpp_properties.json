@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "D:/Boost_1_66_0"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/Program Files (x86)/Thunder Network/Thunder/Profiles/AdData/AdTips/Functional/Scenes/msys64/mingw64/bin/g++.exe",
+            // "compilerPath": "D:/directory/Visual Studio IDE/VC/Tools/MSVC/14.16.27023/bin/HostX64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "windows-gcc-x64"
+            // "intelliSenseMode": "msvc-x64"       // msvc
+        }
+    ],
+    "version": 4
+}
