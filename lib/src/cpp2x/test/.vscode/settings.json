@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.json": "bat",
+        "*.vimrc": "viml",
+        "adc.h": "c",
+        "functional": "cpp"
+    }
+}
