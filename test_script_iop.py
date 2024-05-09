@@ -3,7 +3,7 @@ import sys
 import shutil
 
 Vflag = "-Wall -Werror -Wextra --pedantic --std=c++20 -Wno-unused -Wno-error=deprecated-copy"
-src_dir = "./src/cpp2x/test/"
+src_dir = "./src/cpp17/test/container_test/"
 target_dir = "./build/bin/"
 
 def excu_test(move_flag = True):

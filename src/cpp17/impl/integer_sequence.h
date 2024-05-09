@@ -7,8 +7,8 @@
 
 #pragma once
 
+#ifndef _INTEGER_SEQUENCE_IOP_DEFINE_ 
 #define _INTEGER_SEQUENCE_IOP_DEFINE_ 
-#ifdef _INTEGER_SEQUENCE_IOP_DEFINE_ 
 
 #include "../cppconfig.h"
 #include "../type_traits.h"

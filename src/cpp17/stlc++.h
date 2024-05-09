@@ -1,5 +1,5 @@
+#ifndef STLCXX_HDEFINE
 #define STLCXX_HDEFINE
-#ifdef STLCXX_HDEFINE
 
 #include "allocator_F.h"
 #include "allocator_result.h"

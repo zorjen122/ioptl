@@ -1,7 +1,7 @@
 #pragma once
 
+#ifndef _IOP_MULTIMAP_F_
 #define _IOP_MULTIMAP_F_
-#ifdef _IOP_MULTIMAP_F_
 
 #include "../functionals.h"
 #include "./rb_tree_F.h"
@@ -24,7 +24,7 @@ namespace iop {
         struct _Select1st
             : public unary_function<_Pair, typename _Pair::first_type>
         {
-            typename _Pair::first_type &operator()(const _Pair &__x) const
+            typename _Pair::first_type operator()(const _Pair &__x) const
             {
                 return __x.first;
             }
@@ -35,7 +35,7 @@ namespace iop {
             iop::rbtree<key_type, value_type, _Select1st<value_type>, _Compare>;
 
       public:
-        using iterator = typename rbtree_type::const_iterator;
+        using iterator = typename rbtree_type::iterator;
         using const_iterator = typename rbtree_type::const_iterator;
         using pointer = typename rbtree_type::pointer;
         using const_pointer = typename rbtree_type::const_pointer;

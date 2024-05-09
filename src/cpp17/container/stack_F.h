@@ -13,11 +13,11 @@
 
 #pragma once
 
+#ifndef _STACK_IOP_DEFINE_
 #define _STACK_IOP_DEFINE_
-#ifdef _STACK_IOP_DEFINE_
 
-#include "deque_F.h"
-#include "utilitys.h"
+#include "./deque_F.h"
+#include "../utilitys.h"
 
 #include <initializer_list>
 
@@ -47,17 +47,17 @@ namespace iop {
 
         reference top() { return V_stack.back(); }
 
-        IOP_CONSTEXPR_CXX17 void push(const_reference __v)
+        constexpr void push(const_reference __v)
         {
             V_stack.push_back(__v);
         }
-        IOP_CONSTEXPR_CXX17 void pop() { V_stack.pop_back(); }
-        IOP_CONSTEXPR_CXX17 void swap(stack &__res)
+        constexpr void pop() { V_stack.pop_back(); }
+        constexpr void swap(stack &__res)
         {
             V_stack.swap(__res.V_stack);
         }
-        IOP_CONSTEXPR_CXX17 size_type size() { return V_stack.size(); }
-        IOP_CONSTEXPR_CXX17 bool empty() { return V_stack.empty(); }
+        constexpr size_type size() { return V_stack.size(); }
+        constexpr bool empty() { return V_stack.empty(); }
 
         stack &operator=(const stack &__res) { V_stack = __res.V_stack; }
 

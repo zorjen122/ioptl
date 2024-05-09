@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _ARRAY_IOP_DEFINE_
 #define _ARRAY_IOP_DEFINE_
-#ifdef _ARRAY_IOP_DEFINE_
 
 #include "../algobase_F.h"
 #include "../allocator_F.h"
@@ -20,7 +20,7 @@
 #include <initializer_list>
 
 #define _OPERATOR_THAN(op)                                                     \
-    IOP_CONSTEXPR_CXX17 bool operator op(array &__rhs)                         \
+    constexpr bool operator op(array &__rhs)                                   \
     {                                                                          \
         value_type __iter = 0;                                                 \
         for (auto __it = __rhs.begin(); __it != __rhs.end();                   \
@@ -48,7 +48,7 @@ namespace iop {
         using const_reference = const value_type &;
 
         using iterator = pointer;
-        using const_iterator = const iterator;
+        using const_iterator = const_pointer;
         using reverse_iterator = iop::iter::reverse_iterator<iterator>;
         using const_reverse_iterator =
             iop::iter::reverse_iterator<const_iterator>;
@@ -79,37 +79,37 @@ namespace iop {
             uninitialized_copy(__rhs.begin(), __rhs.end(), _Varray);
         }
 
-        IOP_CONSTEXPR_CXX17 iterator end() NOEXCEPT
+        constexpr iterator end() noexcept
         {
             return static_cast<iterator>(_Varray + (_len));
         }
 
-        IOP_CONSTEXPR_CXX17 iterator begin() NOEXCEPT
+        constexpr iterator begin() noexcept
         {
             return static_cast<iterator>(_Varray);
         }
 
-        IOP_CONSTEXPR_CXX17 const_iterator end() const NOEXCEPT
+        constexpr const_iterator end() const noexcept
         {
             return static_cast<const_iterator>(_Varray + (_len));
         }
 
-        IOP_CONSTEXPR_CXX17 const_iterator begin() const NOEXCEPT
+        constexpr const_iterator begin() const noexcept
         {
             return static_cast<const_iterator>(_Varray);
         }
 
-        IOP_CONSTEXPR_CXX17 const_iterator cend() const NOEXCEPT
+        constexpr const_iterator cend() const noexcept
         {
             return static_cast<const_iterator>(_Varray + (_len));
         }
-        IOP_CONSTEXPR_CXX17 const_iterator cbegin() const NOEXCEPT
+        constexpr const_iterator cbegin() const noexcept
         {
             return static_cast<const_iterator>(_Varray);
         }
 
-        IOP_CONSTEXPR_CXX17 reference back() NOEXCEPT { return *(end() - 1); }
-        IOP_CONSTEXPR_CXX17 reference front() NOEXCEPT { return *(begin()); }
+        constexpr reference back() noexcept { return *(end() - 1); }
+        constexpr reference front() noexcept { return *(begin()); }
 
         reference at(const size_type &__v)
         {
@@ -119,7 +119,7 @@ namespace iop {
                 return _Varray + __v + 1;
         }
 
-        IOP_CONSTEXPR_CXX17 void fill(const value_type &__val) NOEXCEPT
+        constexpr void fill(const value_type &__val) noexcept
         {
             pointer __res = _Varray;
             for (; __res != end(); ++__res) {
@@ -127,8 +127,8 @@ namespace iop {
             }
         }
 
-        IOP_CONSTEXPR_CXX17 void swap(array &__rhs)
-            NOEXCEPT(NOEXCEPT(::std::swap(::std::declval<reference>(),
+        constexpr void swap(array &__rhs)
+            noexcept(noexcept(::std::swap(::std::declval<reference>(),
                                           ::std::declval<reference>())))
         {
             iterator it = this->begin();
@@ -139,7 +139,7 @@ namespace iop {
             }
         }
 
-        IOP_CONSTEXPR_CXX17 const_reference at(size_type __idx)
+        constexpr const_reference at(size_type __idx)
         {
             if (__idx >= size())
                 throw;
@@ -147,28 +147,28 @@ namespace iop {
                 return *(_Varray + __idx + 1);
         }
 
-        IOP_CONSTEXPR_CXX17 bool empty() NOEXCEPT
+        constexpr bool empty() noexcept
         {
             return (_Varray == nullptr);
         }
-        IOP_CONSTEXPR_CXX17 const_reference data() NOEXCEPT { return *_Varray; }
+        constexpr const_reference data() noexcept { return *_Varray; }
 
-        IOP_CONSTEXPR_CXX17 size_type size() NOEXCEPT { return _len; }
-        IOP_CONSTEXPR_CXX17 const size_type size() const NOEXCEPT
+        constexpr size_type size() noexcept { return _len; }
+        constexpr const size_type size() const noexcept
         {
             return _len;
         }
-        IOP_CONSTEXPR_CXX17 size_type max_size() NOEXCEPT
+        constexpr size_type max_size() noexcept
         {
             return size_type(-1);
         }
-        IOP_CONSTEXPR_CXX17 const size_type max_size() const NOEXCEPT
+        constexpr const size_type max_size() const noexcept
         {
             return size_type(-1);
         }
 
       public:
-        IOP_CONSTEXPR_CXX17 bool operator>(array &__rhs)
+        constexpr bool operator>(array &__rhs)
         {
             value_type __iter = 0;
             pointer __res = __rhs.data();
@@ -182,36 +182,36 @@ namespace iop {
         _OPERATOR_THAN(<=);
         _OPERATOR_THAN(>=);
 
-        IOP_CONSTEXPR_CXX17 reference operator[](size_type __idx) NOEXCEPT
+        constexpr reference operator[](size_type __idx) noexcept
         {
             return *(_Varray + __idx);
         }
 
-        IOP_CONSTEXPR_CXX17 const_reference
-        operator[](size_type __idx) const NOEXCEPT
+        constexpr const_reference
+        operator[](size_type __idx) const noexcept
         {
             return *(_Varray + __idx);
         }
 
-        IOP_CONSTEXPR_CXX17 bool operator==(array &__rhs) NOEXCEPT
+        constexpr bool operator==(array &__rhs) noexcept
         {
             return (__rhs == *this);
         }
-        IOP_CONSTEXPR_CXX17 bool operator!=(array &__rhs) NOEXCEPT
+        constexpr bool operator!=(array &__rhs) noexcept
         {
             return (__rhs != *this);
         }
     };
 
     template <size_t _I, class _T, size_t _N>
-    IOP_CONSTEXPR_CXX17 _T &get(const iop::array<_T, _N> &__rhs) NOEXCEPT
+    constexpr _T &get(const iop::array<_T, _N> &__rhs) noexcept
     {
         static_assert(_I < _N, "Error: more index than cap size");
         return const_cast<_T &>(__rhs[_I]);
     }
 
     template <size_t _I, class _T, size_t _N>
-    IOP_CONSTEXPR_CXX17 _T &&get(iop::array<_T, _N> &&__rhs) NOEXCEPT
+    constexpr _T &&get(iop::array<_T, _N> &&__rhs) noexcept
     {
         static_assert(_I < _N, "Error: more index than cap size");
         return Fiop::move(__rhs[_I]);

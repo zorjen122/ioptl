@@ -1,0 +1,4 @@
+Hello, do you know cpp?
+yes! I know, I like cpp this language.
+oh! me too
+

@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _LIST_IOP_DEFINE_
 #define _LIST_IOP_DEFINE_
-#ifdef _LIST_IOP_DEFINE_
 
 #include "../allocator_F.h"
 #include "../allocator_traits_F.h"
@@ -50,11 +50,11 @@ namespace iop {
         void V_incr() { V_node = V_node->V_next; }
         void V_decr() { V_node = V_node->V_prev; }
 
-        bool operator==(const list_iterator_base &__rhs) const NOEXCEPT
+        bool operator==(const list_iterator_base &__rhs) const noexcept
         {
             return V_node == __rhs.V_node;
         }
-        bool operator!=(const list_iterator_base &__rhs) const NOEXCEPT
+        bool operator!=(const list_iterator_base &__rhs) const noexcept
         {
             return V_node != __rhs.V_node;
         }
@@ -82,31 +82,31 @@ namespace iop {
             : list_iterator_base(__rhs.V_node)
         {}
 
-        reference operator*() const NOEXCEPT
+        reference operator*() const noexcept
         {
             return static_cast<node_T *>(V_node)->V_data;
         }
 
-        Self_ &operator++() NOEXCEPT
+        Self_ &operator++() noexcept
         {
             V_incr();
             return *this;
         }
 
-        Self_ operator++(int) NOEXCEPT
+        Self_ operator++(int) noexcept
         {
             Self_ k = *this;
             V_incr();
             return k;
         }
 
-        Self_ &operator--() NOEXCEPT
+        Self_ &operator--() noexcept
         {
             V_decr();
             return *this;
         }
 
-        Self_ operator--(int) NOEXCEPT
+        Self_ operator--(int) noexcept
         {
             Self_ k = *this;
             V_decr();
@@ -114,11 +114,13 @@ namespace iop {
         }
     };
 
-    template <class _Ty, class _Alloc = allocator<__list_node<_Ty>>> class list
+    template <class _Ty, class _Alloc = allocator<_Ty>> class list
     {
       protected:
         using allocator_type = _Alloc;
         using allocator_traits_type = allocator_traits<_Alloc>;
+        using allocator_node_type = typename allocator_traits_type::template 
+                                rebind<__list_node<_Ty>>::other;
         using node_T = __list_node<_Ty>;
         using const_node = __list_node<const _Ty>;
 
@@ -136,17 +138,18 @@ namespace iop {
         using const_iterator = list_iterator<_Ty, const _Ty &, const _Ty *>;
 
       public:
-        explicit list() NOEXCEPT { V_initializer_list(); }
+        explicit list() noexcept { V_initializer_list(); }
 
-        explicit list(const_reference __v, const size_type __sz) NOEXCEPT
+        explicit list(const_reference __v, const size_type __sz) noexcept
         {
             V_initializer_list();
 
             for (size_type i = 0; i < __sz - 1; ++i)
                 push_back(__v);
+                
         }
 
-        explicit list(const list &__res) NOEXCEPT
+        explicit list(const list &__res) noexcept
         {
             V_uninitializer_copy(__res);
         }
@@ -166,17 +169,17 @@ namespace iop {
 
       protected:
         node_T *V_node;
-        [[no_unique_address]] allocator_type __List_allocator;
+        [[no_unique_address]] allocator_node_type __List_allocator;
 
       protected:
-        void V_initializer_list() NOEXCEPT
+        void V_initializer_list() noexcept
         {
             V_node = __List_allocator.allocate(1);
             V_node->V_next = V_node;
             V_node->V_prev = V_node;
         }
 
-        node_T *V_unit_create(const _Ty &__val) NOEXCEPT
+        node_T *V_unit_create(const _Ty &__val) noexcept
         {
             node_T *k = __List_allocator.allocate(1);
             construct_at(&k->V_data, __val);
@@ -205,7 +208,7 @@ namespace iop {
         }
 
       public:
-        allocator_type get_allocator() NOEXCEPT { return allocator_type(); }
+        allocator_node_type get_allocator() noexcept { return allocator_node_type(); }
 
         void clear()
         {
@@ -299,11 +302,11 @@ namespace iop {
             return static_cast<iterator>(res);
         }
 
-        bool empty() NOEXCEPT { return (V_node->V_next == V_node); }
+        bool empty() noexcept { return (V_node->V_next == V_node); }
 
-        bool empty() const NOEXCEPT { return (V_node->V_next == V_node); }
+        bool empty() const noexcept { return (V_node->V_next == V_node); }
 
-        size_type size() NOEXCEPT
+        size_type size() noexcept
         {
             size_type _n = 0;
             for (iterator __iter = begin(); __iter != end(); ++__iter, ++_n)
@@ -317,72 +320,72 @@ namespace iop {
             ::std::swap(V_node, __res.V_node);
         }
 
-        size_type max_size() const NOEXCEPT { return size_type(-1); }
+        size_type max_size() const noexcept { return size_type(-1); }
 
-        reference front() NOEXCEPT { return *begin(); }
-        const_reference front() const NOEXCEPT { return *begin(); }
+        reference front() noexcept { return *begin(); }
+        const_reference front() const noexcept { return *begin(); }
 
-        reference back() NOEXCEPT { return *(--end()); }
-        const_reference back() const NOEXCEPT { return *(--end()); }
+        reference back() noexcept { return *(--end()); }
+        const_reference back() const noexcept { return *(--end()); }
 
-        iterator begin() NOEXCEPT
+        iterator begin() noexcept
         {
             return static_cast<iterator>(static_cast<node_T *>(V_node->V_next));
         }
-        const_iterator begin() const NOEXCEPT
+        const_iterator begin() const noexcept
         {
             return static_cast<const_iterator>(
                 static_cast<node_T *>(V_node->V_next));
         }
 
-        iterator end() NOEXCEPT { return static_cast<iterator>(V_node); }
-        const_iterator end() const NOEXCEPT
+        iterator end() noexcept { return static_cast<iterator>(V_node); }
+        const_iterator end() const noexcept
         {
             return static_cast<const_iterator>(V_node);
         }
 
-        iterator push_back(const _Ty &__val) NOEXCEPT
+        iterator push_back(const _Ty &__val) noexcept
         {
             return insert(end(), __val);
         }
 
-        const_iterator push_back(const _Ty &__val) const NOEXCEPT
+        const_iterator push_back(const _Ty &__val) const noexcept
         {
             return static_cast<const_iterator>(insert(end(), __val));
         }
 
-        iterator push_front(const _Ty &__val) NOEXCEPT
+        iterator push_front(const _Ty &__val) noexcept
         {
             return insert(begin(), __val);
         }
 
-        const_iterator push_front(const _Ty &__val) const NOEXCEPT
+        const_iterator push_front(const _Ty &__val) const noexcept
         {
             return static_cast<const_iterator>(insert(begin(), __val));
         }
 
-        iterator pop_back() NOEXCEPT(NOEXCEPT(!empty()))
+        iterator pop_back() noexcept(noexcept(!empty()))
         {
             return erase(--end());
         }
-        const_iterator pop_back() const NOEXCEPT(NOEXCEPT(!empty()))
+        const_iterator pop_back() const noexcept(noexcept(!empty()))
         {
             return static_cast<const_iterator>(erase(end()));
         }
 
-        iterator pop_front() NOEXCEPT(NOEXCEPT(!empty()))
+        iterator pop_front() noexcept(noexcept(!empty()))
         {
             return erase(begin());
         }
 
-        const_iterator pop_front() const NOEXCEPT(!empty())
+        const_iterator pop_front() const noexcept(!empty())
         {
             {
                 return static_cast<const_iterator>(erase(begin()));
             }
         }
 
-        void remove(const value_type &__v) NOEXCEPT
+        void remove(const value_type &__v) noexcept
         {
             if (!empty()) {
                 iterator it = begin();
@@ -396,7 +399,9 @@ namespace iop {
             }
         }
 
-        void unique() NOEXCEPT
+        // remove_if TODO
+
+        void unique() noexcept
         {
             if (!empty()) {
                 iterator it = begin();
@@ -413,7 +418,7 @@ namespace iop {
         }
 
         void transfer(iterator __pos, iterator __first,
-                      iterator __last) NOEXCEPT
+                      iterator __last) noexcept
         {
             if (__pos != __last) {
                 // Remove [first, last) from its old position.
@@ -429,14 +434,14 @@ namespace iop {
             }
         }
 
-        void splice(iterator __pos, list<_Ty> &__rhs) NOEXCEPT
+        void splice(iterator __pos, list<_Ty> &__rhs) noexcept
         {
             if (!__rhs.empty()) {
                 transfer(__pos, __rhs.begin(), __rhs.end());
             }
         }
 
-        void merge(list<_Ty> &__res) NOEXCEPT
+        void merge(list<_Ty> &__res) noexcept
         {
             if (empty()) {
                 for (iterator it = __res.begin(); it != __res.end(); ++it)
@@ -460,7 +465,7 @@ namespace iop {
             }
         }
 
-        void reverse() NOEXCEPT
+        void reverse() noexcept
         {
             if (!empty()) {
                 size_type i = size() - (size() / 2);
@@ -485,7 +490,7 @@ namespace iop {
         void resize(size_type __n) { resize(__n, _Ty()); }
 
         void assign(size_type count, const_reference value)
-            NOEXCEPT(NOEXCEPT(!empty()))
+            noexcept(noexcept(!empty()))
         {
             iterator it = begin();
 
@@ -528,7 +533,7 @@ namespace iop {
             assign(ilist.begin(), ilist.end());
         }
 
-        void sort() NOEXCEPT
+        void sort() noexcept
         {
             node_T *it = V_node;
             while (it->V_next != V_node) {
@@ -571,12 +576,12 @@ namespace iop {
             return Fiop::move(*this);
         }
 
-        bool operator!=(const list &__res) NOEXCEPT
+        bool operator!=(const list &__res) noexcept
         {
             return !(__res.V_node == V_node);
         }
 
-        bool operator==(const list &__res) NOEXCEPT
+        bool operator==(const list &__res) noexcept
         {
             return (__res.V_node == V_node);
         }

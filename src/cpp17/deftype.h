@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _DEFTYPE_
 #define _DEFTYPE_
-#ifdef _DEFTYPE_
 
 #include "cppconfig.h"
 #include "metacomponent.h"

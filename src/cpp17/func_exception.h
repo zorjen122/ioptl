@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _FUNC_EXPCEPTION_IOP_DEFINE
 #define _FUNC_EXPCEPTION_IOP_DEFINE
-#ifdef _FUNC_EXPCEPTION_IOP_DEFINE
 
 #include <exception>
 #include <stdexcept>

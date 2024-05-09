@@ -1,7 +1,7 @@
 #pragma once
 
+#ifndef _IOP_SET_H_
 #define _IOP_SET_H_
-#ifdef _IOP_SET_H_
 
 #include "../functionals.h"
 #include "./rb_tree_F.h"
@@ -25,7 +25,7 @@ namespace iop {
         using key_compare = _Compare;
         using value_compare = _Compare;
 
-        using iterator = typename rbtree_type::const_iterator;
+        using iterator = typename rbtree_type::iterator;
         using const_iterator = typename rbtree_type::const_iterator;
         using pointer = typename rbtree_type::pointer;
         using const_pointer = typename rbtree_type::const_pointer;

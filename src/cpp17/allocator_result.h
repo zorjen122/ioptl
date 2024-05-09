@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "cppconfig.h"
-
+#ifndef _ALLOCATOR_RESULT_
 #define _ALLOCATOR_RESULT_
-#ifdef _ALLOCATOR_RESULT_
+
+#include "cppconfig.h"
 
 namespace iop {
 

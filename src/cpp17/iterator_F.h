@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _ITERATOR_IOP_
 #define _ITERATOR_IOP_
-#ifdef _ITERATOR_IOP_
 
 #include "cppconfig.h"
 #include "iterator_base_F.h"
@@ -81,10 +81,11 @@ namespace iop {
         IOP_FUNCTIONAL_ITERATOR_OF_CONTAIER(front_insert_iterator,
                                             output_iterator_tag, push_front);
 
-        template <class _Ty> class trivial_iterator
+
+                template <class _Ty> class trivial_iterator
         {
           protected:
-            using __Traits_type = iterator_traits<_Ty>;
+            using __Traits_type = iterator_traits<_Ty *>;
 
           public:
             using iterator_category = typename __Traits_type::iterator_category;
@@ -98,98 +99,95 @@ namespace iop {
 
           public:
             trivial_iterator() : iter(nullptr) {}
-            trivial_iterator(pointer __p) : iter(__p) {}
+            trivial_iterator(const pointer &__p) : iter(__p) {}
+            trivial_iterator(pointer &&__p) : iter(Fiop::move(__p)) {}
 
             explicit trivial_iterator(const trivial_iterator &__src)
                 : iter(__src.iter)
             {}
 
             explicit trivial_iterator(trivial_iterator &&__src)
-                : iter(Fiop::forward<trivial_iterator>(__src.iter))
-            {
-                __src.iter = nullptr;
-            };
+                : iter(Fiop::move(__src.iter)){};
 
           public:
-            constexpr reference operator*() NOEXCEPT { return *iter; }
+            constexpr reference operator*() noexcept { return *iter; }
+            constexpr pointer operator->() noexcept { return iter; }
 
-            constexpr pointer operator->() NOEXCEPT { return iter; }
-
-            constexpr trivial_iterator &operator++() NOEXCEPT
+            constexpr trivial_iterator &operator++() noexcept
             {
                 ++iter;
                 return *this;
             }
 
-            constexpr trivial_iterator &operator++(int) NOEXCEPT
+            constexpr trivial_iterator &operator++(int) noexcept
             {
                 return trivial_iterator(iter++);
             }
 
-            constexpr trivial_iterator &operator--() NOEXCEPT
+            constexpr trivial_iterator &operator--() noexcept
             {
                 --iter;
                 return *this;
             }
 
-            constexpr trivial_iterator &operator--(int) NOEXCEPT
+            constexpr trivial_iterator &operator--(int) noexcept
             {
-                return trivial_iterator(iter++);
+                return trivial_iterator(iter--);
             }
 
-            constexpr trivial_iterator &operator-(difference_type __n) NOEXCEPT
+            constexpr trivial_iterator operator-(difference_type __n) noexcept
             {
-                iter -= __n;
-                return *this;
+                return iter - __n;
             }
 
-            trivial_iterator &operator+(difference_type __n) NOEXCEPT
+            constexpr trivial_iterator operator+(difference_type __n) noexcept
             {
-                iter += __n;
-                return *this;
+                return iter + __n;
             }
 
             constexpr difference_type
-            operator-(const trivial_iterator &__src) NOEXCEPT
+            operator-(const trivial_iterator &__src) noexcept
             {
                 return static_cast<difference_type>(iter - __src.iter);
             }
 
-            constexpr difference_type
-            operator+(const trivial_iterator &__src) NOEXCEPT
-            {
-                return static_cast<difference_type>(iter + __src.iter);
-            }
-
-            constexpr trivial_iterator &operator+=(difference_type __n) NOEXCEPT
+            constexpr trivial_iterator &operator+=(difference_type __n) noexcept
             {
                 iter = iter + __n;
                 return *this;
             }
 
-            constexpr trivial_iterator &operator-=(difference_type __n) NOEXCEPT
+            constexpr trivial_iterator &operator-=(difference_type __n) noexcept
             {
                 iter = iter - __n;
                 return *this;
             }
 
-            constexpr bool operator==(const trivial_iterator &__src) NOEXCEPT
+            constexpr bool operator==(const trivial_iterator &__src) noexcept
             {
                 return (iter == __src.iter);
             }
 
-            constexpr bool operator!=(const trivial_iterator &__src) NOEXCEPT
+            constexpr bool operator!=(const trivial_iterator &__src) noexcept
             {
                 return !(iter == __src.iter);
             }
 
-            constexpr auto operator=(const trivial_iterator &__src)
+            constexpr trivial_iterator &operator=(const trivial_iterator &__src)
             {
                 iter = __src.iter;
                 return iter;
             }
-        };
 
+            constexpr trivial_iterator &operator=(trivial_iterator &&__src)
+            {
+                iter = __src.iter;
+                __src.iter = nullptr;
+
+                return *this;
+            }
+        };
+        
         template <class _Contaier> class insert_iterator
         {
           protected:
@@ -206,7 +204,7 @@ namespace iop {
 
             constexpr explicit insert_iterator(
                 const contaier_type &__res,
-                typename _Contaier::iterator __iter) NOEXCEPT
+                typename _Contaier::iterator __iter) noexcept
                 : contaier(&__res),
                   iter(__iter)
             {}
@@ -219,15 +217,15 @@ namespace iop {
                 return *this;
             }
 
-            constexpr insert_iterator<contaier_type> &operator*() NOEXCEPT
+            constexpr insert_iterator<contaier_type> &operator*() noexcept
             {
                 return *this;
             }
-            constexpr insert_iterator<contaier_type> &operator++() NOEXCEPT
+            constexpr insert_iterator<contaier_type> &operator++() noexcept
             {
                 return *this;
             }
-            constexpr insert_iterator<contaier_type> &operator++(int) NOEXCEPT
+            constexpr insert_iterator<contaier_type> &operator++(int) noexcept
             {
                 return *this;
             }
@@ -250,43 +248,43 @@ namespace iop {
                 reverse_history_bidirectional_iterator<_Iterator, _Ty,
                                                        _Reference, _Distance>;
 
-            constexpr reverse_history_bidirectional_iterator() NOEXCEPT {}
+            constexpr reverse_history_bidirectional_iterator() noexcept {}
             constexpr explicit reverse_history_bidirectional_iterator(
-                _Iterator __res) NOEXCEPT : current(__res)
+                _Iterator __res) noexcept : current(__res)
             {}
 
-            constexpr _Iterator Base() const NOEXCEPT { return current; }
+            constexpr _Iterator Base() const noexcept { return current; }
 
-            constexpr reference operator*() const NOEXCEPT
+            constexpr reference operator*() const noexcept
             {
                 _Iterator inner = current;
                 return *--inner;
             }
 
-            constexpr pointer operator->() const NOEXCEPT
+            constexpr pointer operator->() const noexcept
             {
                 return &(operator*());
             }
 
-            constexpr Self &operator++() NOEXCEPT
+            constexpr Self &operator++() noexcept
             {
                 --current;
                 return *this;
             }
 
-            constexpr Self operator++(int) NOEXCEPT
+            constexpr Self operator++(int) noexcept
             {
                 _Iterator _inner = current;
                 --current;
                 return _inner;
             }
 
-            constexpr Self operator--() NOEXCEPT
+            constexpr Self operator--() noexcept
             {
                 ++current;
                 return *this;
             }
-            constexpr Self &operator--(int) NOEXCEPT
+            constexpr Self &operator--(int) noexcept
             {
                 _Iterator _inner = current;
                 ++current;
@@ -312,63 +310,63 @@ namespace iop {
             using Self =
                 reverse_history_iterator<_Iterator, _Ty, _Reference, _Distance>;
 
-            constexpr reverse_history_iterator() NOEXCEPT {}
+            constexpr reverse_history_iterator() noexcept {}
             constexpr explicit reverse_history_iterator(
-                _Iterator __res) NOEXCEPT : current(__res)
+                _Iterator __res) noexcept : current(__res)
             {}
 
-            constexpr _Iterator Base() const NOEXCEPT { return current; }
+            constexpr _Iterator Base() const noexcept { return current; }
 
-            reference operator*() const NOEXCEPT { return *(--current); }
-            pointer operator->() const NOEXCEPT { return &(operator*()); }
+            reference operator*() const noexcept { return *(--current); }
+            pointer operator->() const noexcept { return &(operator*()); }
 
-            constexpr Self &operator++() NOEXCEPT
+            constexpr Self &operator++() noexcept
             {
                 --current;
                 return *this;
             }
 
-            constexpr Self operator++(int) NOEXCEPT
+            constexpr Self operator++(int) noexcept
             {
                 _Iterator _inner = current;
                 --current;
                 return _inner;
             }
 
-            constexpr Self &operator--() NOEXCEPT
+            constexpr Self &operator--() noexcept
             {
                 ++current;
                 return *this;
             }
 
-            constexpr Self operator--(int) NOEXCEPT
+            constexpr Self operator--(int) noexcept
             {
                 _Iterator _inner = current;
                 ++current;
                 return _inner;
             }
 
-            constexpr Self &operator+=(_Distance __n) NOEXCEPT
+            constexpr Self &operator+=(_Distance __n) noexcept
             {
                 current -= __n;
                 return *this;
             }
 
-            constexpr Self &operator-=(_Distance __n) NOEXCEPT
+            constexpr Self &operator-=(_Distance __n) noexcept
             {
                 current += __n;
                 return *this;
             }
 
-            constexpr Self operator+(_Distance __n) const NOEXCEPT
+            constexpr Self operator+(_Distance __n) const noexcept
             {
                 return _Self(current - __n);
             }
-            constexpr Self operator-(_Distance __n) const NOEXCEPT
+            constexpr Self operator-(_Distance __n) const noexcept
             {
                 return _Self(current + __n);
             }
-            constexpr _Reference operator[](_Distance __n) const NOEXCEPT
+            constexpr _Reference operator[](_Distance __n) const noexcept
             {
                 return *(*this + __n);
             }
@@ -400,7 +398,7 @@ namespace iop {
             using Self = reverse_iterator<_Iterator>;
 
           public:
-            constexpr reverse_iterator() NOEXCEPT {}
+            constexpr reverse_iterator() noexcept {}
             constexpr explicit reverse_iterator(iterator_type __x)
                 : current(__x)
             {}
@@ -408,66 +406,66 @@ namespace iop {
             constexpr reverse_iterator(const Self &__x) : current(__x.current)
             {}
 
-            constexpr iterator_type base() const NOEXCEPT { return current; }
+            constexpr iterator_type base() const noexcept { return current; }
 
-            constexpr reference operator*() const NOEXCEPT
+            constexpr reference operator*() const noexcept
             {
                 _Iterator inner = current;
                 return *--inner;
             }
 
-            constexpr pointer operator->() const NOEXCEPT
+            constexpr pointer operator->() const noexcept
             {
                 return &(operator*());
             }
 
-            constexpr Self &operator++() NOEXCEPT
+            constexpr Self &operator++() noexcept
             {
                 --current;
                 return *this;
             }
 
-            constexpr Self operator++(int) NOEXCEPT
+            constexpr Self operator++(int) noexcept
             {
                 _Iterator _inner = current;
                 --current;
                 return _inner;
             }
 
-            constexpr Self &operator--() NOEXCEPT
+            constexpr Self &operator--() noexcept
             {
                 ++current;
                 return *this;
             }
 
-            constexpr Self operator--(int) NOEXCEPT
+            constexpr Self operator--(int) noexcept
             {
                 _Iterator _inner = current;
                 ++current;
                 return _inner;
             }
 
-            constexpr Self &operator+=(difference_type __n) NOEXCEPT
+            constexpr Self &operator+=(difference_type __n) noexcept
             {
                 current -= __n;
                 return *this;
             }
 
-            constexpr Self &operator-=(difference_type __n) NOEXCEPT
+            constexpr Self &operator-=(difference_type __n) noexcept
             {
                 current += __n;
                 return *this;
             }
 
-            constexpr Self operator+(difference_type __n) const NOEXCEPT
+            constexpr Self operator+(difference_type __n) const noexcept
             {
                 return _Self(current - __n);
             }
-            constexpr Self operator-(difference_type __n) const NOEXCEPT
+            constexpr Self operator-(difference_type __n) const noexcept
             {
                 return _Self(current + __n);
             }
-            constexpr reference operator[](difference_type __n) const NOEXCEPT
+            constexpr reference operator[](difference_type __n) const noexcept
             {
                 return *(*this + __n);
             }
@@ -484,7 +482,7 @@ namespace iop {
 
         template <random_access_iterator_tag_cond _Iterator>
         constexpr random_access_iterator_tag
-        iterator_category(const reverse_iterator<_Iterator> &) NOEXCEPT
+        iterator_category(const reverse_iterator<_Iterator> &) noexcept
         {
             return random_access_iterator_tag();
         }

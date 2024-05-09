@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _UTILITY_IOP_DEFINE_
 #define _UTILITY_IOP_DEFINE_
-#ifdef _UTILITY_IOP_DEFINE_
 
 #include "./impl/integer_sequence.h"
 #include "cppconfig.h"
@@ -19,14 +19,14 @@ namespace Fiop {
     // forward
     template <class _Ty>
     [[__nodiscard__]] constexpr _Ty &&
-    forward(mpls::remove_reference_t<_Ty> &__tl) NOEXCEPT
+    forward(mpls::remove_reference_t<_Ty> &__tl) noexcept
     {
         return static_cast<_Ty &&>(__tl);
     }
 
     template <class _Ty>
     [[__nodiscard__]] constexpr _Ty &&
-    forward(mpls::remove_reference_t<_Ty> &&__tl) NOEXCEPT
+    forward(mpls::remove_reference_t<_Ty> &&__tl) noexcept
     {
         static_assert(!mpls::is_lvalue_reference<_Ty>::value,
                       "cannot forward an rvalue as an lvalue");
@@ -37,7 +37,7 @@ namespace Fiop {
     // move
     template <class _Ty>
     [[__nodiscard__]] constexpr auto&&
-    move(_Ty&& __tl) NOEXCEPT
+    move(_Ty&& __tl) noexcept
     {
         return static_cast<mpls::remove_reference_t<_Ty>&&>(__tl);
     }

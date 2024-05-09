@@ -1,6 +1,6 @@
-#include "../algorithm.h"
-#include "../iterator_base_F.h"
-#include "../container/list_F.h"
+#include "../../algorithm.h"
+#include "../../iterator_base_F.h"
+#include "../../container/list_F.h"
 
 #include <iostream>
 #include <list>

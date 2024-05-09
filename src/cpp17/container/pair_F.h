@@ -1,8 +1,7 @@
 #pragma once
 
+#ifndef _IOP_PAIR_H_
 #define _IOP_PAIR_H_
-#ifdef _IOP_PAIR_H_
-
 
 namespace iop {
 

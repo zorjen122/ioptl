@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _ALGOBASE_IOP_
 #define _ALGOBASE_IOP_
-#ifdef _ALGOBASE_IOP_
 
 #include "cppconfig.h"
 #include "utilitys.h"

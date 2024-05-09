@@ -6,11 +6,12 @@
 
 #pragma once
 
+#ifndef _ARITHMETIC_IOP_
 #define _ARITHMETIC_IOP_
-#ifdef _ARITHMETIC_IOP_
 
 #include "functionals.h"
 #include "utilitys.h"
+#include "iterator_util_F.h"
 
 namespace iop_algo {
 

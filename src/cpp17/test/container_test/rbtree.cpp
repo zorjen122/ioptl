@@ -1,8 +1,8 @@
-#include "../container/rb_tree_F.h"
-#include "../functionals.h"
+#include "../../container/rb_tree_F.h"
+#include "../../functionals.h"
 
 #include<iostream>
-#include "test_.h"
+#include "../test_.h"
 using namespace std;
 
 

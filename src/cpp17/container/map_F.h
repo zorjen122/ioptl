@@ -1,7 +1,7 @@
 #pragma once
 
+#ifndef _IOP_MAP_H_
 #define _IOP_MAP_H_
-#ifdef _IOP_MAP_H_
 
 #include "../functionals.h"
 #include "./rb_tree_F.h"
@@ -22,10 +22,10 @@ namespace iop {
 
       protected:
         template <typename _Pair>
-        struct _Select1st
+        struct _Selectlst
             : public unary_function<_Pair, typename _Pair::first_type>
         {
-            typename _Pair::first_type &operator()(const _Pair &__x) const
+            typename _Pair::first_type operator()(const _Pair &__x) const
             {
                 return __x.first;
             }
@@ -33,10 +33,10 @@ namespace iop {
 
         using allocator_type = _Alloc;
         using rbtree_type =
-            iop::rbtree<key_type, value_type, _Select1st<value_type>, _Compare>;
+            iop::rbtree<key_type, value_type, _Selectlst<value_type>, _Compare>;
 
       public:
-        using iterator = typename rbtree_type::const_iterator;
+        using iterator = typename rbtree_type::iterator;
         using const_iterator = typename rbtree_type::const_iterator;
         using pointer = typename rbtree_type::pointer;
         using const_pointer = typename rbtree_type::const_pointer;

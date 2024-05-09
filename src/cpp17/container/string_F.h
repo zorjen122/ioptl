@@ -4,8 +4,8 @@
  *
  */
 
+#ifndef _STRING_F_DEFINE_
 #define _STRING_F_DEFINE_
-#ifdef _STRING_F_DEFINE_
 
 #include "../allocator_F.h"
 #include "../allocator_traits_F.h"
@@ -18,7 +18,6 @@
         in any container (such as SSO, ESO, etc.),
         but is only a basic function realization,
         so use it with caution.
-
 */
 
 namespace iop {
@@ -42,7 +41,7 @@ namespace iop {
         using reference = value_type &;
         using const_reference = const value_type &;
         using iterator = pointer;
-        using const_iterator = const iterator;
+        using const_iterator = const_pointer;
         using reverse_iterator = iop::iter::reverse_iterator<iterator>;
         using const_reverse_iterator =
             iop::iter::reverse_iterator<const_iterator>;
@@ -160,7 +159,7 @@ namespace iop {
         }
 
       public:
-        basic_string &insert(const_iterator __pos, const_pointer __val)
+        basic_string &insert(iterator __pos, pointer __val)
         {
 
             size_type psz = _M_data_traits.length(__val);
@@ -168,11 +167,11 @@ namespace iop {
             pointer res = _V_allocator.allocate(_Vcap + psz + 1);
 
             iterator iter = begin();
-            const_pointer piter = __val;
+            pointer piter = __val;
 
-            const_iterator start_pos = uninitialized_copy(iter, __pos, res);
+            iterator start_pos = uninitialized_copy(iter, __pos, res);
 
-            const_iterator add_pos =
+            iterator add_pos =
                 uninitialized_copy(piter, (piter + psz), start_pos);
 
             uninitialized_copy(__pos, end(), add_pos);
@@ -185,6 +184,10 @@ namespace iop {
 
             return *this;
         }
+
+        basic_string &insert(const_iterator __pos, const_pointer __val)
+        { return insert(__pos, __val); }
+
 
         basic_string &erase(size_type index, int count = -1)
         {
@@ -229,6 +232,11 @@ namespace iop {
             erase(start_n - 1, 1);
             return begin() + start_n;
         }
+        constexpr const_iterator erase(const_iterator __first, const_iterator __last)
+        { return erase(__first, __last); }
+        constexpr const_iterator erase(const_iterator __pos)
+        { return erase(__pos); }
+
 
         basic_string &append(int setp, const_pointer val)
         {
@@ -386,13 +394,16 @@ namespace iop {
         }
 
       public:
-        const_iterator find(const_iterator __s)
+        iterator find(iterator __s)
         {
             auto i = begin();
             while (i != __s)
                 ++i;
             return i;
         }
+        const_iterator find(const_iterator __s)
+        { return find(__s); }
+
 
         size_type find(const value_type &__s)
         {

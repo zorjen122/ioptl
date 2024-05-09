@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) 1997    -zorjen122
  * Silicon Graphics Computer Systems, Inc.
  *
@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _ALLOC_OPERATOR_NEW_IOP_
 #define _ALLOC_OPERATOR_NEW_IOP_
-#ifdef _ALLOC_OPERATOR_NEW_IOP_
 
 #include "cppconfig.h"
 #include "utilitys.h"
@@ -26,6 +26,8 @@ namespace iop {
 
         using size_type = size_t;
         using difference_type = ::std::ptrdiff_t;
+
+        IOP_CONSTEXPR __Default_alloc() noexcept = default;
 
 #if IOP_VERSION > 20
         [[nodiscard]] IOP_CONSTEXPR_CXX23 __allocation_result<_Ty>
@@ -67,10 +69,10 @@ namespace iop {
         using size_type = size_t;
         using difference_type = ::std::ptrdiff_t;
 
-        IOP_CONSTEXPR __Default_alloc() NOEXCEPT = default;
+        IOP_CONSTEXPR __Default_alloc() noexcept = default;
 
         template <class _Tp>
-        IOP_CONSTEXPR __Default_alloc(const __Default_alloc<_Tp> &) NOEXCEPT
+        IOP_CONSTEXPR __Default_alloc(const __Default_alloc<_Tp> &) noexcept
         {}
 
 #if IOP_VERSION > 20
@@ -108,7 +110,7 @@ namespace iop {
     }; //* namespace iop
 
     template <class _Ty> struct allocator : public __Default_alloc<_Ty>
-    {};
+    { };
 
 } // namespace iop
 

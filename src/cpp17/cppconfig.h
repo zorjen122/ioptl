@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _CONSTEXPR_VERSION_DEF_
 #define _CONSTEXPR_VERSION_DEF_
-#ifdef _CONSTEXPR_VERSION_DEF_
 
 #ifdef __cplusplus
 
@@ -83,5 +83,10 @@
 #endif
 
 #endif //* __cplusplus
+
+
+#define NAMESPACE_BEGIN(name) namespace name{
+#define NAMESPACE_END(name) }; // namespace iop
+
 
 #endif //* _CONSTEXPR_VERSION_DEF_

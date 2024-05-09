@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _TYPE_MPL_TRAITS_
 #define _TYPE_MPL_TRAITS_
-#ifdef _TYPE_MPL_TRAITS_
 
 #include "metacomponent.h"
 #include <cstddef>
@@ -381,6 +381,19 @@ namespace mpls {
         static_assert(_always_false<_Ty>,
                       "Calling declval is ill-formed, see N4892 [declval]/2.");
     }
+
+    
+    template<class From, class To>
+    constexpr To convertible_to() { return declval<From>(); }
+
+    template<class From, class To>
+    using is_convertible = mpls::is_same<To, decltype(convertible_to<From, To>())>;
+    
+    template<class From, class To>
+    using is_convertible_t = typename is_convertible<From, To>::type;
+
+    template<class From, class To>
+    constexpr bool is_convertible_v = is_convertible<From, To>::value;
 
 }; // namespace mpls
 

@@ -1,4 +1,5 @@
-#include "../container/string_F.h"
+#include "../../container/string_F.h"
+#include "../../algorithm.h"
 
 #include <iostream>
 #include <iomanip>
@@ -11,7 +12,7 @@ void strErase() {
     s.erase(7, 3); // 使用重载 (1) 擦除 " An"
     std::cout << "2) " << s << '\n';
 
-    s.erase(std::find(s.begin(), s.end(), ' ')); // 使用重载 (2) 擦除第一个 ' '
+    s.erase(iop_algo::find(s.begin(), s.end(), ' ')); // 使用重载 (2) 擦除第一个 ' '
     std::cout << "3) " << s << '\n';
 
     s.erase(s.find(' ')); // 使用重载 (1) 截掉从 ' ' 到字符串结尾的部分

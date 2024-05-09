@@ -42,7 +42,7 @@
     };
 
 // some arithmetic only make non-mult meta-function for such which.
-#define P_ONE_ARITHMETIC_OP(name, op)                                          \
+#define P_UNARY_ARITHMETIC_OP(name, op)                                          \
     template <class N1, class N2> struct name                                  \
     {                                                                          \
         using value_type =                                                     \
@@ -53,7 +53,7 @@
     };
 
 /* relational operation */
-#define P_ONE_RELATIONAL_OP_BOOL(name, op)                                     \
+#define P_UNARY_RELATIONAL_OP_BOOL(name, op)                                     \
     template <class N1, class N2> struct name                                  \
     {                                                                          \
         using value_type = bool;                                               \
@@ -190,18 +190,18 @@ namespace mpls {
         P_MULT_ARITHMETIC_OP(bitor_, |);
         P_MULT_ARITHMETIC_OP(bitxor_, ^);
 
-        P_ONE_ARITHMETIC_OP(minus, *);
-        P_ONE_ARITHMETIC_OP(divides, /);
-        P_ONE_ARITHMETIC_OP(modulus, %);
-        P_ONE_ARITHMETIC_OP(left_shift, <<);
-        P_ONE_ARITHMETIC_OP(right_shift, >>);
+        P_UNARY_ARITHMETIC_OP(minus, *);
+        P_UNARY_ARITHMETIC_OP(divides, /);
+        P_UNARY_ARITHMETIC_OP(modulus, %);
+        P_UNARY_ARITHMETIC_OP(left_shift, <<);
+        P_UNARY_ARITHMETIC_OP(right_shift, >>);
 
-        P_ONE_RELATIONAL_OP_BOOL(equal_to, ==);
-        P_ONE_RELATIONAL_OP_BOOL(not_equal_to, !=);
-        P_ONE_RELATIONAL_OP_BOOL(greater, >);
-        P_ONE_RELATIONAL_OP_BOOL(greater_equal, >=);
-        P_ONE_RELATIONAL_OP_BOOL(less, <);
-        P_ONE_RELATIONAL_OP_BOOL(less_equal, <=);
+        P_UNARY_RELATIONAL_OP_BOOL(equal_to, ==);
+        P_UNARY_RELATIONAL_OP_BOOL(not_equal_to, !=);
+        P_UNARY_RELATIONAL_OP_BOOL(greater, >);
+        P_UNARY_RELATIONAL_OP_BOOL(greater_equal, >=);
+        P_UNARY_RELATIONAL_OP_BOOL(less, <);
+        P_UNARY_RELATIONAL_OP_BOOL(less_equal, <=);
 
         P_MULT_RELATIONAL_OP_BOOL(and_, &&);
         P_MULT_RELATIONAL_OP_BOOL(or_, ||);

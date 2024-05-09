@@ -6,8 +6,9 @@
 
 #pragma once
 
+#ifndef _INITAILIZER_LIST_IOP_DEFINE_
 #define _INITAILIZER_LIST_IOP_DEFINE_
-#ifdef _INITAILIZER_LIST_IOP_DEFINE_
+
 
 #include "../allocator_F.h"
 #include "../allocator_traits_F.h"

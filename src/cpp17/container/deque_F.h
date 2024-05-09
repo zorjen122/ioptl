@@ -13,19 +13,20 @@
 
 #pragma once
 
+#ifndef _DEQUE_IOP_DEFINE_
 #define _DEQUE_IOP_DEFINE_
-#ifdef _DEQUE_IOP_DEFINE_
 
 #include "../algobase_F.h"
 #include "../algorithm.h"
 #include "../allocator_traits_F.h"
 #include "../iterator_F.h"
+#include "../iterator_base_F.h"
 
 #include <initializer_list>
 
 namespace iop {
 
-    IOP_CONSTEXPR size_t __deque_buf_size(size_t __sz) NOEXCEPT
+    IOP_CONSTEXPR size_t __deque_buf_size(size_t __sz) noexcept
     {
         return (__sz > 512) ? size_t(512 / __sz) : size_t(1);
     }
@@ -176,9 +177,9 @@ namespace iop {
     {
       protected:
         using allocator_node_type = _Alloc;
-        using allocator_map_type = allocator<_Ty *>;
         using allocator_traits_type = allocator_traits<_Alloc>;
-
+        using allocator_map_type = typename allocator_traits_type::template 
+                                rebind<_Ty*>::other;
       public:
         using value_type = _Ty;
         using size_type = typename allocator_traits_type::size_type;
@@ -221,7 +222,7 @@ namespace iop {
 
         ~deque()
         {
-            iop::destroy_at(V_start, V_finish);
+            destroy(V_start.V_first, V_finish.V_last);
             if (V_map) {
                 V_destroy_node(V_start.V_node, V_finish.V_node + 1);
                 V_deallocate_map(V_map, V_map_size);
@@ -233,7 +234,7 @@ namespace iop {
         {
             size_type sz = __res.size();
             V_initialize_map(sz, V_map, V_map_size, V_start, V_finish);
-            iop::uninitialized_copy(__res.begin(), __res.end(), V_start);
+            uninitialized_copy(__res.begin(), __res.end(), V_start);
         }
 
         deque(const ::std::initializer_list<_Ty> &__res)
@@ -241,23 +242,15 @@ namespace iop {
         {
             V_initialize_map(__res.size(), V_map, V_map_size, V_start,
                              V_finish);
-            iop::uninitialized_copy(__res.begin(), __res.end(), V_start);
+            uninitialized_copy(__res.begin(), __res.end(), V_start);
         }
 
       protected:
         size_t S_buf_size() { return __deque_buf_size(sizeof(_Ty)); }
-
-        // deallocate
-        // void V_deallocate_map(_Ty **__p) {
-        //     __map_allocator.deallocate(__p);
-        // }
         void V_deallocate_map(_Ty **__p, size_type __n = 0)
         {
             __map_allocator.deallocate(__p, __n);
         }
-        // void V_deallocate_node(_Ty *__p) {
-        //     __node_allocator.deallocate(__p);
-        // }
         void V_deallocate_node(_Ty *__p, size_type __n = 0)
         {
             __node_allocator.deallocate(__p, __n);
@@ -274,7 +267,7 @@ namespace iop {
             return __node_allocator.allocate(__n);
         }
 
-        // create/destory
+        // create/destroy
         void V_create_nodes(_Ty **__n, _Ty **__N)
         {
             _Ty **i;
@@ -369,36 +362,36 @@ namespace iop {
 
         void V_reserve_map_at_back(size_type __nodes_to_add = 1)
         {
-            if (__nodes_to_add + 1 > V_map_size - (V_finish.V_node - V_map))
+            if (__nodes_to_add + 1 > (size_type)(V_map_size - (V_finish.V_node - V_map)))
                 V_reallocate_map(__nodes_to_add, false);
         }
 
         void V_reserve_map_at_front(size_type __nodes_to_add = 1)
         {
-            if (__nodes_to_add > V_start.V_node - V_map)
+            if (__nodes_to_add > (size_type)(V_start.V_node - V_map))
                 V_reallocate_map(__nodes_to_add, true);
         }
 
       public:
-        allocator_node_type get_allocator() NOEXCEPT
+        allocator_node_type get_allocator() noexcept
         {
             return allocator_node_type();
         }
 
-        iterator begin() NOEXCEPT { return V_start; }
-        iterator end() NOEXCEPT { return V_finish; }
+        iterator begin() noexcept { return V_start; }
+        iterator end() noexcept { return V_finish; }
 
-        const_iterator begin() const NOEXCEPT
+        const_iterator begin() const noexcept
         {
             return static_cast<const_iterator>(V_start);
         }
-        const_iterator end() const NOEXCEPT
+        const_iterator end() const noexcept
         {
             return static_cast<const_iterator>(V_finish);
         }
 
         size_type size() { return static_cast<size_type>(end() - begin()); }
-        const size_type size() const NOEXCEPT
+        const size_type size() const noexcept
         {
             return static_cast<size_type>(end() - begin());
         }
@@ -656,7 +649,7 @@ namespace iop {
         }
 
         void resize(size_type __n, const_reference __v)
-            NOEXCEPT(NOEXCEPT(__n >= max_size()))
+            noexcept(noexcept(__n >= max_size()))
         {
             int d = size() - __n;
             if (d < 0)
@@ -669,7 +662,7 @@ namespace iop {
 
         void resize(const size_type &__n) { resize(__n, value_type()); }
 
-        // ERR
+        // todo
         void shrink_to_fit() { throw; }
     };
 
@@ -698,7 +691,7 @@ namespace iop {
 
     template <class _T, class _Alloc>
     void swap(iop::deque<_T, _Alloc> &__c1, iop::deque<_T, _Alloc> &__c2)
-        NOEXCEPT(NOEXCEPT(__c1.swap(__c2)))
+        noexcept(noexcept(__c1.swap(__c2)))
     {
         __c1.swap(__c2);
     }

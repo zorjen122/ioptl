@@ -4,10 +4,8 @@
  *
  */
 
-#pragma once
-
+#ifndef _FUNCTIONAL_IOP_DEFINE_
 #define _FUNCTIONAL_IOP_DEFINE_
-#ifdef _FUNCTIONAL_IOP_DEFINE_
 
 #include "allocator_F.h"
 #include "allocator_traits_F.h"
@@ -22,8 +20,8 @@
     template <class _Ty, class _Tp = _Ty>                                      \
     struct NAME : public IS_A_OBJ<_Ty, _Tp, RETURN>                            \
     {                                                                          \
-        IOP_CONSTEXPR_CXX17 RETURN operator()(const _Ty &__a,                  \
-                                              const _Tp &__b) NOEXCEPT         \
+        constexpr RETURN operator()(const _Ty &__a,                  \
+                                              const _Tp &__b) noexcept         \
         {                                                                      \
             return (__a OP __b);                                               \
         }                                                                      \
@@ -32,7 +30,7 @@
 #define UNARY_ARITHMETIC_FUNC_OP(NAME, IS_A_OBJ, RETURN, OP)                   \
     template <class _Ty> struct NAME : public IS_A_OBJ<_Ty, RETURN>            \
     {                                                                          \
-        IOP_CONSTEXPR_CXX17 RETURN operator()(const _Ty &__a) NOEXCEPT         \
+        constexpr RETURN operator()(const _Ty &__a) noexcept         \
         {                                                                      \
             return OP(__a);                                                    \
         }                                                                      \
@@ -64,13 +62,13 @@ namespace iop {
 
             explicit comom_func(_F &&__f) : f(Fiop::forward<_F>(__f)) {}
 
-            virtual comom_func_base *clones() const NOEXCEPT
+            virtual comom_func_base *clones() const noexcept
             {
                 //* instantiation *this member f is only _F-null or _F-pfunc.
                 return new comom_func(*this);
             }
 
-            virtual _R invoke(_Args &&...__args) const NOEXCEPT
+            virtual _R invoke(_Args &&...__args) const noexcept
             {
                 return f(Fiop::forward<_Args>(__args)...);
             }
@@ -100,19 +98,19 @@ namespace iop {
         function(_F &&__f) : func__(new comom_func<_F>(Fiop::forward<_F>(__f)))
         {}
 
-        IOP_CONSTEXPR_CXX17 void swap(function &ano)
-            NOEXCEPT(swap_ptr(::std::declval<function &>(),
+        constexpr void swap(function &ano)
+            noexcept(swap_ptr(::std::declval<function &>(),
                               ::std::declval<function &>()))
         {
             swap_ptr(func__, ano.func__);
         }
 
-        IOP_CONSTEXPR_CXX17 operator bool() const NOEXCEPT
+        constexpr operator bool() const noexcept
         {
             return func__ != nullptr;
         }
 
-        IOP_CONSTEXPR_CXX17 _R operator()(_Args &&...__args) const
+        constexpr _R operator()(_Args &&...__args) const
         {
             if (static_cast<bool>(*this) == false)
                 throw bad_function_call();
@@ -154,13 +152,13 @@ namespace iop {
             : f(__p), v(__c)
         {}
 
-        IOP_CONSTEXPR_CXX17 typename _FOP::result_type
-        operator()(typename _FOP::first_type __c) NOEXCEPT
+        constexpr typename _FOP::result_type
+        operator()(typename _FOP::first_type __c) noexcept
         {
             return f(__c);
         }
 
-        IOP_CONSTEXPR_CXX17 typename _FOP::result_type operator()() NOEXCEPT
+        constexpr typename _FOP::result_type operator()() noexcept
         {
             return f(v);
         }
@@ -184,14 +182,14 @@ namespace iop {
             : f(__p), fv(__a), sv(__b)
         {}
 
-        IOP_CONSTEXPR_CXX17 typename _FOP::result_type
+        constexpr typename _FOP::result_type
         operator()(typename _FOP::first_type __a,
-                   typename _FOP::second_type __b) NOEXCEPT
+                   typename _FOP::second_type __b) noexcept
         {
             return f(__a, __b);
         }
 
-        IOP_CONSTEXPR_CXX17 typename _FOP::result_type operator()() NOEXCEPT
+        constexpr typename _FOP::result_type operator()() noexcept
         {
             return f(fv, sv);
         }
@@ -208,7 +206,7 @@ namespace iop {
         typename _FOP3::first_type v;
 
       public:
-        explicit double_bind() NOEXCEPT : f1(_FOP1()),
+        explicit double_bind() noexcept : f1(_FOP1()),
                                           f2(_FOP2()),
                                           f3(_FOP3()),
                                           v()
@@ -223,13 +221,13 @@ namespace iop {
             : f1(__p1), f2(__p2), f3(__p3)
         {}
 
-        IOP_CONSTEXPR_CXX17 typename _FOP1::result_type
-        operator()(typename _FOP3::first_type __c) NOEXCEPT
+        constexpr typename _FOP1::result_type
+        operator()(typename _FOP3::first_type __c) noexcept
         {
             return f1(f2(f3(__c)));
         }
 
-        IOP_CONSTEXPR_CXX17 typename _FOP1::result_type operator()() NOEXCEPT
+        constexpr typename _FOP1::result_type operator()() noexcept
         {
             return f1(f2(f3(v)));
         }
@@ -242,10 +240,10 @@ namespace iop {
         _R (*f)(_Ty) = nullptr;
 
       public:
-        explicit pointer_unary_function() NOEXCEPT {}
+        explicit pointer_unary_function() noexcept {}
         pointer_unary_function(_R (*__p)(_Ty)) : f(__p) {}
 
-        IOP_CONSTEXPR_CXX17 _R operator()(_Ty &&__v) const NOEXCEPT
+        constexpr _R operator()(_Ty &&__v) const noexcept
         {
             return f(Fiop::forward<_Ty>(__v));
         }
@@ -261,22 +259,22 @@ namespace iop {
         explicit pointer_binary_function() {}
         pointer_binary_function(_R (*__p)(_Ty, _Tp)) : f(__p) {}
 
-        IOP_CONSTEXPR_CXX17 _R operator()(_Ty &&__a, _Tp &&__b) const NOEXCEPT
+        constexpr _R operator()(_Ty &&__a, _Tp &&__b) const noexcept
         {
             return f(Fiop::forward<_Ty>(__a), Fiop::forward<_Tp>(__b));
         }
     };
 
     template <class _R, class _Ty>
-    IOP_CONSTEXPR_CXX17 pointer_unary_function<_R, _Ty>
-    ptr_fun(_R (*__f)(_Ty)) NOEXCEPT
+    constexpr pointer_unary_function<_R, _Ty>
+    ptr_fun(_R (*__f)(_Ty)) noexcept
     {
         return pointer_unary_function<_R, _Ty>(__f);
     }
 
     template <class _R, class _Ty, class _Tp>
-    IOP_CONSTEXPR_CXX17 pointer_binary_function<_R, _Ty, _Tp>
-    ptr_fun(_R (*__f)(_Ty, _Tp)) NOEXCEPT
+    constexpr pointer_binary_function<_R, _Ty, _Tp>
+    ptr_fun(_R (*__f)(_Ty, _Tp)) noexcept
     {
         return pointer_binary_function<_R, _Ty, _Tp>(__f);
     }
@@ -290,7 +288,7 @@ namespace iop {
       public:
         explicit mem_fun_t(_R (_Ty::*__p)()) : f(__p) {}
 
-        IOP_CONSTEXPR_CXX17 _R operator()(_Ty *__p) const NOEXCEPT
+        constexpr _R operator()(_Ty *__p) const noexcept
         {
             return (__p->*f)();
         }
@@ -305,7 +303,7 @@ namespace iop {
       public:
         explicit mem_fun_ref_t(_R (_Ty::*__p)()) : f(__p) {}
 
-        IOP_CONSTEXPR_CXX17 _R &operator()(_Ty &__p) const NOEXCEPT
+        constexpr _R &operator()(_Ty &__p) const noexcept
         {
             return (__p.*f)();
         }
@@ -320,7 +318,7 @@ namespace iop {
       public:
         explicit const_mem_fun_t(_R (_Ty::*__p)() const) : f(__p) {}
 
-        IOP_CONSTEXPR_CXX17 _R operator()(_Ty *__p) const NOEXCEPT
+        constexpr _R operator()(_Ty *__p) const noexcept
         {
             return (__p->*f)();
         }
@@ -335,7 +333,7 @@ namespace iop {
       public:
         explicit const_mem_fun_ref_t(_R (_Ty::*__p)()) : f(__p) {}
 
-        IOP_CONSTEXPR_CXX17 _R &operator()(_Ty &__p) const NOEXCEPT
+        constexpr _R &operator()(_Ty &__p) const noexcept
         {
             return (__p.*f)();
         }

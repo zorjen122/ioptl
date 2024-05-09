@@ -6,8 +6,8 @@
 
 #pragma once
 
+#ifndef _VECTOR_IOP_
 #define _VECTOR_IOP_
-#ifdef _VECTOR_IOP_
 
 #include "../algorithm.h"
 #include "../allocator_F.h"
@@ -37,36 +37,36 @@ namespace iop {
         using reference = value_type &;
         using const_reference = const value_type &;
         using iterator = pointer;
-        using const_iterator = const iterator;
-        using reverse_iterator = iop::iter::reverse_iterator<iterator>;
+        using const_iterator = const_pointer;
+        using reverse_iterator = iter::reverse_iterator<iterator>;
         using const_reverse_iterator =
-            iop::iter::reverse_iterator<const_iterator>;
+            iter::reverse_iterator<const_iterator>;
 
       public:
-        explicit vector() NOEXCEPT : V_start(), V_finish(), V_cap() {}
+        explicit vector() noexcept : V_start(), V_finish(), V_storage() {}
 
         vector(const vector &vec)
         {
             V_uninitailzed_alloc(vec.size());
-            V_finish = iop::uninitialized_copy(vec.begin(), vec.end(), V_start);
+            V_finish = uninitialized_copy(vec.begin(), vec.end(), V_start);
         }
 
         ~vector()
         {
-            iop::destroy_at(V_start, V_finish);
+            destroy_at(V_start, V_finish);
             __Vec_allocator.deallocate(V_start,
-                                       static_cast<size_type>(V_cap - V_start));
+                                       static_cast<size_type>(V_storage - V_start));
         }
 
         vector(const ::std::initializer_list<_Ty> &__rhs)
         {
             V_uninitailzed_alloc(__rhs.size());
             V_finish =
-                iop::uninitialized_copy(__rhs.begin(), __rhs.end(), V_start);
+                uninitialized_copy(__rhs.begin(), __rhs.end(), V_start);
         }
 
         explicit vector(size_type __n, const _Alloc &)
-            : V_start(), V_finish(), V_cap()
+            : V_start(), V_finish(), V_storage()
         {
             assert(__n > 0);
             V_uninitailzed_alloc(__n);
@@ -74,15 +74,15 @@ namespace iop {
         }
 
         //* Similar to LLVM-LIBCPP vector of the conition define
-        explicit vector(size_type __n) : V_start(), V_finish(), V_cap()
+        explicit vector(size_type __n) : V_start(), V_finish(), V_storage()
         {
             assert(__n > 0);
             V_uninitailzed_alloc(__n);
             V_finish += __n;
         }
 
-        explicit vector(size_type __n, value_type __val)
-            : V_start(), V_finish(), V_cap()
+        explicit vector(size_type __n, const_reference __val)
+            : V_start(), V_finish(), V_storage()
         {
             assert(__n > 0);
             V_uninitailzed_alloc(__n);
@@ -90,50 +90,50 @@ namespace iop {
             V_finish += __n;
         }
 
-        explicit vector(vector &&__rhs) NOEXCEPT
+        explicit vector(vector &&__rhs) noexcept
         {
             V_start = __rhs.V_start;
             V_finish = __rhs.V_finish;
-            V_cap = __rhs.V_cap;
+            V_storage = __rhs.V_storage;
 
             __rhs.V_start = nullptr;
             __rhs.V_finish = nullptr;
-            __rhs.V_cap = nullptr;
+            __rhs.V_storage = nullptr;
         }
 
       protected:
         iterator V_start;
         iterator V_finish;
-        iterator V_cap;
+        iterator V_storage;
         [[no_unique_address]] allocator_type __Vec_allocator;
 
-        IOP_CONSTEXPR_CXX17 pointer V_allocate(size_type __n)
+        constexpr pointer V_allocate(size_type __n)
         {
             return __Vec_allocator.allocate(__n);
         }
 
-        IOP_CONSTEXPR_CXX17 void V_deallocate(pointer __ptr, size_type __n)
+        constexpr void V_deallocate(pointer __ptr, size_type __n)
         {
             return __Vec_allocator.deallocate(__ptr, __n);
         }
 
-        IOP_CONSTEXPR_CXX17 void V_deallocate(pointer __ptr)
+        constexpr void V_deallocate(pointer __ptr)
         {
             return __Vec_allocator.deallocate(__ptr);
         }
 
         //* This function is compatible
         // with common construction and copy construction.
-        IOP_CONSTEXPR_CXX17 void V_uninitailzed_alloc(size_type __n)
+        constexpr void V_uninitailzed_alloc(size_type __n)
         {
             V_start = V_allocate(__n);
             V_finish = V_start;
-            V_cap = V_start + __n;
+            V_storage = V_start + __n;
         }
 
         void V_insert_one_aux(iterator __pos, const_reference __val)
         {
-            if (V_finish != V_cap) {
+            if (V_finish != V_storage) {
                 construct_at(--V_finish);
                 ++V_finish;
 
@@ -149,123 +149,126 @@ namespace iop {
                 iterator new_finish = new_start;
 
                 //* since copy processing conduct try of the handle
-                new_finish = iop::uninitialized_copy(V_start, __pos, new_start);
+                new_finish = uninitialized_copy(V_start, __pos, new_start);
                 construct_at(new_finish, __val);
                 ++new_finish;
 
                 new_finish =
-                    iop::uninitialized_copy(__pos, V_finish, new_finish);
+                    uninitialized_copy(__pos, V_finish, new_finish);
 
-                iop::destroy_at(begin(), end());
-                V_deallocate(V_start, static_cast<size_type>(V_cap - V_start));
+                destroy_at(begin(), end());
+                V_deallocate(V_start, static_cast<size_type>(V_storage - V_start));
                 V_start = new_start;
                 V_finish = new_finish;
-                V_cap = new_start + n;
+                V_storage = new_start + n;
             }
         }
 
       public:
-        IOP_CONSTEXPR_CXX17 allocator_type get_allocator() NOEXCEPT
+        constexpr allocator_type get_allocator() noexcept
         {
             return allocator_type();
         }
 
-        IOP_CONSTEXPR_CXX17 iterator begin() NOEXCEPT { return V_start; }
-        IOP_CONSTEXPR_CXX17 const_iterator begin() const NOEXCEPT
+        constexpr iterator begin() noexcept { return V_start; }
+        constexpr const_iterator begin() const noexcept
         {
             return V_start;
         }
 
-        IOP_CONSTEXPR_CXX17 iterator end() NOEXCEPT { return V_finish; }
-        IOP_CONSTEXPR_CXX17 const_iterator end() const NOEXCEPT
+        constexpr iterator end() noexcept { return V_finish; }
+        constexpr const_iterator end() const noexcept
         {
             return V_finish;
         }
 
-        IOP_CONSTEXPR_CXX17 reference front() NOEXCEPT { return *V_start; }
-        IOP_CONSTEXPR_CXX17 const_reference front() const NOEXCEPT
+        constexpr reference front() noexcept { return *V_start; }
+        constexpr const_reference front() const noexcept
         {
             return *V_start;
         }
 
-        IOP_CONSTEXPR_CXX17 reference back() NOEXCEPT
+        constexpr reference back() noexcept
         {
             return *(V_finish - 1);
         }
-        IOP_CONSTEXPR_CXX17 const_reference back() const NOEXCEPT
+        constexpr const_reference back() const noexcept
         {
             return *(V_finish - 1);
         }
 
-        IOP_CONSTEXPR_CXX17 bool empty() NOEXCEPT { return begin() == end(); }
-        IOP_CONSTEXPR_CXX17 bool empty() const NOEXCEPT
+        constexpr bool empty() noexcept { return begin() == end(); }
+        constexpr bool empty() const noexcept
         {
             return begin() == end();
         }
 
-        IOP_CONSTEXPR_CXX17 void swap(vector &vec)
+        constexpr void swap(vector &vec)
         {
             ::std::swap(V_start, vec.V_start);
             ::std::swap(V_finish, vec.V_finish);
-            ::std::swap(V_cap, vec.V_cap);
+            ::std::swap(V_storage, vec.V_storage);
         }
 
-        IOP_CONSTEXPR_CXX17 size_type size() NOEXCEPT
+        constexpr size_type size() noexcept
         {
             return static_cast<size_type>(end() - begin());
         }
 
-        IOP_CONSTEXPR_CXX17 size_type size() const NOEXCEPT
+        constexpr size_type size() const noexcept
         {
             return static_cast<size_type>(end() - begin());
         }
 
-        IOP_CONSTEXPR_CXX17 size_type capacity() NOEXCEPT
+        constexpr size_type capacity() noexcept
         {
-            return static_cast<size_type>(V_cap - V_start);
+            return static_cast<size_type>(V_storage - V_start);
         };
 
-        IOP_CONSTEXPR_CXX17 const size_type capacity() const NOEXCEPT
+        constexpr const size_type capacity() const noexcept
         {
-            return static_cast<size_type>(V_cap - V_start);
+            return static_cast<size_type>(V_storage - V_start);
         };
 
-        IOP_CONSTEXPR_CXX17 size_type max_size() NOEXCEPT
+        constexpr size_type max_size() noexcept
         {
             return size_type(-1);
         }
-        IOP_CONSTEXPR_CXX17 const size_type max_size() const NOEXCEPT
+        constexpr const size_type max_size() const noexcept
         {
             return size_type(-1);
         }
 
-        IOP_CONSTEXPR_CXX17 void reserve(size_type __ncap)
-            NOEXCEPT(NOEXCEPT(__ncap > max_size()))
+        constexpr void reserve(size_type __ncap)
+            noexcept(noexcept(__ncap > max_size()))
         {
-            if (V_cap < __ncap) {
+            size_type end_storage = (size_type)(V_storage - V_start);
+            size_type size = (size_type)(V_finish - V_start);
+            if (end_storage < __ncap) {
                 iterator new_start = __Vec_allocator.allocate(__ncap);
-                iop::uninitialized_copy(V_start, V_finish, new_start);
+                uninitialized_copy(V_start, V_finish, new_start);
 
-                iop::destroy_at(V_start, V_finish);
-                V_deallocate(V_start, static_cast<size_type>(V_cap - V_start));
+                destroy_at(V_start, V_finish);
+                V_deallocate(V_start, static_cast<size_type>(V_storage - V_start));
+
 
                 V_start = new_start;
-                V_finish = new_start + __ncap;
-                V_cap = __ncap;
+                V_finish = new_start + size;
+                V_storage = V_start + __ncap;
             }
         }
 
-        IOP_CONSTEXPR_CXX17 void shrink_to_fit()
+        constexpr void shrink_to_fit()
         {
-            if (V_finish != V_cap) {
-                for (auto &i = V_finish; i != V_cap; ++i)
-                    iop::destroy_at(i);
+            if (V_finish != V_storage) {
+                for (auto &i = V_finish; i != V_storage; ++i)
+                    destroy_at(i);
             }
         }
 
-        IOP_CONSTEXPR_CXX17 void push_back(const_reference __val)
+        constexpr void push_back(const_reference __val)
         {
-            if (V_finish != V_cap) {
+            if (V_finish != V_storage) {
                 construct_at(V_finish, __val);
                 ++V_finish;
             }
@@ -273,53 +276,54 @@ namespace iop {
                 V_insert_one_aux(end(), __val);
         }
 
-        IOP_CONSTEXPR_CXX17 void push_back()
+        constexpr void push_back()
         {
-            if (V_finish != V_cap) {
+            if (V_finish != V_storage) {
                 ++V_finish;
             }
             else
                 V_insert_one_aux(end(), value_type());
         }
 
-        IOP_CONSTEXPR_CXX17 void push_front(const_reference __val)
+        constexpr void push_front(const_reference __val)
         {
             insert(begin(), __val);
         }
 
-        IOP_CONSTEXPR_CXX17 void push_front() { insert(begin(), value_type()); }
+        constexpr void push_front() { insert(begin(), value_type()); }
 
         template <class... _Args>
-        IOP_CONSTEXPR_CXX17 void emplace(const_iterator __pos,
+        constexpr void emplace(iterator __pos, _Args &&...__args)
+        {
+            insert(__pos, value_type(Fiop::forward<_Args>(__args)...));
+        }
+        template <class... _Args>
+        constexpr void emplace(const_iterator __pos,
                                          _Args &&...__args)
         {
-            // TODO
+            emplace((iterator)__pos, __args...);
         }
 
         template <class... _Args>
-        IOP_CONSTEXPR_CXX17 void emplace_back(_Args &&...__args)
+        constexpr void emplace_back(_Args &&...__args)
         {
-            if (V_finish != V_cap) {
-                construct_at(V_finish, Fiop::forward<_Args>(__args)...);
-                ++V_finish;
-            }
-            else
-                emplace(V_finish, Fiop::forward<_Args>(__args)...);
+            emplace(end(), __args...);
         }
 
-        IOP_CONSTEXPR_CXX17 void emplace_front(const_reference __val)
+        template <class... _Args>
+        constexpr void emplace_front(_Args &&...__args)
         {
-            push_front();
+            push_front(value_type(Fiop::forward<_Args>(__args)...));
         }
 
-        IOP_CONSTEXPR_CXX17 void pop_back()
+        constexpr void pop_back()
         {
             assert(!empty());
             --V_finish;
-            iop::destroy_at(V_finish);
+            destroy_at(V_finish);
         }
 
-        iterator erase(const_iterator &__pos)
+        iterator erase(iterator __pos)
         {
             size_type d = static_cast<size_type>(__pos - V_start);
             iterator c = __pos;
@@ -329,10 +333,12 @@ namespace iop {
 
             return V_start + d;
         }
+        iterator erase(const_iterator __pos)
+        { return erase((iterator)__pos); }
 
-        IOP_CONSTEXPR_CXX17 void clear()
+        constexpr void clear()
         {
-            iop::destroy_at(V_start, V_finish);
+            destroy_at(V_start, V_finish);
             V_finish = V_start;
         }
 
@@ -340,7 +346,7 @@ namespace iop {
         {
             size_type l = static_cast<size_type>(__pos - begin());
 
-            if (V_finish != V_cap && __pos == end()) {
+            if (V_finish != V_storage && __pos == end()) {
                 construct_at(V_finish, __val);
                 ++V_finish;
             }
@@ -355,7 +361,7 @@ namespace iop {
         {
             size_type loca = static_cast<size_type>(__pos - begin());
 
-            if (V_finish != V_cap && __pos == end()) {
+            if (V_finish != V_storage && __pos == end()) {
                 construct_at(V_finish, value_type());
                 ++V_finish;
             }
@@ -365,8 +371,26 @@ namespace iop {
 
             return static_cast<iterator>(begin() + loca);
         }
+        
+        const_iterator insert(const_iterator __pos, value_type __val)
+        { return insert((iterator)__pos, __val); }
+        
+        const_iterator insert(const_iterator __pos)
+        { return insert((iterator)__pos); }
 
-        IOP_CONSTEXPR_CXX17 const_reference at(const size_type __n)
+
+        iterator find(const_reference __val)
+        {   
+            iterator it = begin();
+            for(; it != end(); ++it)
+            {
+                if(*it == __val) break;
+            }
+
+            return it;
+        }
+
+        constexpr const_reference at(const size_type __n)
         {
             if (__n >= size())
                 throw bad_range();
@@ -374,7 +398,7 @@ namespace iop {
                 return *(begin() + __n);
         }
 
-        IOP_CONSTEXPR_CXX17 reference operator[](const size_type &__n) NOEXCEPT
+        constexpr reference operator[](const size_type &__n) noexcept
         {
             return *(begin() + __n);
         }
@@ -382,15 +406,15 @@ namespace iop {
         constexpr vector operator=(const vector &vec)
         {
             if (size() < vec.size()) {
-                iop::destroy_at(begin(), end());
-                V_deallocate(V_start, static_cast<size_type>(V_cap - V_start));
+                destroy_at(begin(), end());
+                V_deallocate(V_start, static_cast<size_type>(V_storage - V_start));
                 V_uninitailzed_alloc(vec.size());
             }
             else {
-                iop::destroy_at(begin(), end());
+                destroy_at(begin(), end());
             }
 
-            V_finish = iop::uninitialized_copy(vec.begin(), vec.end(), V_start);
+            V_finish = uninitialized_copy(vec.begin(), vec.end(), V_start);
             return *this;
         }
     };

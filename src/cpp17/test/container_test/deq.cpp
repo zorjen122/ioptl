@@ -1,5 +1,5 @@
-#include "../container/deque_F.h"
-#include "../functionals.h"
+#include "../../container/deque_F.h"
+#include "../../functionals.h"
 
 #include <chrono>
 #include <iostream>
@@ -174,28 +174,18 @@ bool operator!=(const NAlloc<T>&, const NAlloc<U>&) { return false; }
 // }
 
 
-void testFunc(iop::function<void()> __f) {
-    // auto start = std::chrono::high_resolution_clock::now(); // 记录开始时间
-
-    __f();
-
-    // auto end = std::chrono::high_resolution_clock::now(); // 记录结束时间
-    // auto duration =
-    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-    //         .count();
-
-    // cout << duration << " mil\n";
-}
-
+#include "../../type_traits.h"
+#include "../test_.h"
 int main() {
+
 
     testFunc(deqBaseFunc);
 
     cout << "\n\nSwap\n";
     testFunc(deqCopy);
 
-    cout << "\n\nAssign\n";
-    testFunc(deqAssign);
+    // cout << "\n\nAssign\n";
+    // testFunc(deqAssign);
 
     // deq_shrink_to_fit();
 

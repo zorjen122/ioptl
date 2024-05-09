@@ -1,3 +1,8 @@
 /D
-/container/TODO
+/src/cpp17/coding.cc
+/src/cpp17/issue
+/build
+*.md
+*.elf
+a.out
 

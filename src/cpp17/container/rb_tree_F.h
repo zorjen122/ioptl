@@ -1,7 +1,7 @@
 #pragma once
 
+#ifndef _RBTREE_IOP_
 #define _RBTREE_IOP_
-#ifdef _RBTREE_IOP_
 
 #include "../allocator_F.h"
 #include "../allocator_traits_F.h"
@@ -125,7 +125,7 @@ namespace iop {
         using Self_ = rbtree_iterator<_Ty, _Ref, _Ptr>;
 
         rbtree_iterator() { node = nullptr; }
-        rbtree_iterator(const iterator &__r) { node = __r.node; }
+        rbtree_iterator(const_iterator &__r) { node = __r.node; }
         rbtree_iterator(const link_type __r) { node = __r; }
 
         Self_ &operator++()
@@ -167,8 +167,7 @@ namespace iop {
         }
     };
 
-    template <class _K, class _Tv, class _Kv,
-              class _Compare,
+    template <class _K, class _Tv, class _Kv, class _Compare,
               class _Alloc = iop::allocator<__rbtree_node<_Tv>>>
     class rbtree
     {
@@ -192,7 +191,7 @@ namespace iop {
         using const_reference = const value_type &;
 
         using iterator = rbtree_iterator<value_type, reference, pointer>;
-        using const_iterator = const iterator;
+        using const_iterator = typename iterator::const_iterator;
 
       public:
         rbtree(const _Compare &__r = _Compare())
@@ -206,14 +205,17 @@ namespace iop {
             del_node(header);
         }
 
-        rbtree(rbtree &__rhs) : rbtree(__rhs.begin(), __rhs.end()) {}
+        rbtree(const rbtree &__rhs) : rbtree(__rhs.begin(), __rhs.end()) {}
 
-        rbtree(const_iterator __first, const_iterator __last)
+        rbtree(iterator __first, iterator __last)
             : node_size(0), key_compare(_Compare())
         {
             init();
             insert_equal(__first, __last);
         }
+
+        rbtree(const_iterator __first, const_iterator __last)
+        : rbtree(__first, __last) {};        
 
         rbtree(const ::std::initializer_list<value_type> &__rhs)
             : node_size(0), key_compare(_Compare())
@@ -352,7 +354,8 @@ namespace iop {
         iterator end() { return static_cast<iterator>(header); }
         const_iterator begin() const
         {
-            return static_cast<const_iterator>(static_cast<iterator>(leftmost()));
+            return static_cast<const_iterator>(
+                static_cast<iterator>(leftmost()));
         }
         const_iterator end() const
         {
@@ -505,7 +508,7 @@ namespace iop {
             return __insert(inext, iprev, __v);
         }
 
-        iterator insert_equal(const_iterator __first, const_iterator __last)
+        iterator insert_equal(iterator __first, iterator __last)
         {
             auto i = __first;
             while (i != __last) {
@@ -513,6 +516,11 @@ namespace iop {
                 ++i;
             }
             return insert_unique(*i).first;
+        }
+
+        iterator insert_equal(const_iterator __first, const_iterator __last)
+        {
+            return insert_equal((iterator)__first,(iterator) __last);
         }
 
         std::pair<rbtree<_K, _Tv, _Kv, _Compare, _Alloc>::iterator, bool>
@@ -544,21 +552,24 @@ namespace iop {
             return ::std::pair<iterator, bool>(h, false);
         }
 
-                std::pair<rbtree<_K, _Tv, _Kv, _Compare, _Alloc>::iterator, bool>
-        insert_unique(const iterator& __first, const iterator& __last)
+        std::pair<rbtree<_K, _Tv, _Kv, _Compare, _Alloc>::iterator, bool>
+        insert_unique(iterator __first, iterator __last)
         {
-            try{
+            try {
                 auto pos = __first;
-                while(__first != __last)
-                    insert_unique(*(__first++));                
-                
+                while (__first != __last)
+                    insert_unique(*(__first++));
+
                 return ::std::pair<iterator, bool>(__first, true);
             }
-            catch(...)
-            {
+            catch (...) {
                 // TODO
             }
         }
+
+        std::pair<rbtree<_K, _Tv, _Kv, _Compare, _Alloc>::iterator, bool>
+        insert_unique(const_iterator __first, const_iterator __last)
+        { return insert_unique((iterator)__first, (iterator)__last); }
     };
 
 }; // namespace iop

@@ -1,7 +1,7 @@
+#ifndef __DEFINE_QUEUE_H
 #define __DEFINE_QUEUE_H
-#ifdef __DEFINE_QUEUE_H
 
-#include "deque_F.h"
+#include "./deque_F.h"
 
 namespace iop {
     template <class _Ty, class Sequence = iop::deque<_Ty>> class queue

@@ -1,259 +1,96 @@
-/*
- * Copyright (c) 1997    -zorjen122
- * Silicon Graphics Computer Systems, Inc.
- *
- */
-
-#pragma once
-
+#ifndef _ITERATOR_BASE_IOP_
 #define _ITERATOR_BASE_IOP_
-#ifdef _ITERATOR_BASE_IOP_
+
+#include "./iterator_util_F.h"
 
 #include "algobase_F.h"
-#include "cppconfig.h"
 #include "deftype.h"
-#include "metacomponent.h"
 #include "type_traits.h"
 #include "utilitys.h"
-
 #include <assert.h>
 #include <new>
 #include <utility>
 
-#define ITERAOTR_TAG_DEFINE(NAME, IS_A_OBJ)                                    \
-    template <class _Ty, class _Distance>                                      \
-    struct NAME : public IS_A_OBJ<_Ty, _Distance>                              \
-    {                                                                          \
-        using iterator_category = NAME##_tag;                                  \
-        using value_type = _Ty;                                                \
-        using pointer = _Ty *;                                                 \
-        using reference = _Ty &;                                               \
-        using difference_type = _Distance;                                     \
-    };
-
-#define IS_ITERATOR_TAG_TOTAL(ITERATOR_TAG)                                    \
-    template <class _Ty>                                                       \
-    using is_##ITERATOR_TAG = mpls::is_same<_Ty, ITERATOR_TAG>;                \
-    template <class _Ty>                                                       \
-    using is_##ITERATOR_TAG##_t = typename is_##ITERATOR_TAG<_Ty>::type;       \
-    template <class _Ty>                                                       \
-    constexpr bool is_##ITERATOR_TAG##_v = is_##ITERATOR_TAG<_Ty>::value;
 
 namespace iop {
 
-    // Iterator type
-    struct input_iterator_tag
-    {};
-    struct output_iterator_tag
-    {};
-    struct forward_iterator_tag : public input_iterator_tag
-    {};
-    struct bidirectional_iterator_tag : public forward_iterator_tag
-    {};
-    struct random_access_iterator_tag : public bidirectional_iterator_tag
-    {};
-
-    // Iterator
-    template <class _Category, class _Ty, class _Distance = ::std::ptrdiff_t,
-              class _Pointer = _Ty *, class _Reference = _Ty &>
-    class iterator
-    {
-      public:
-        using iterator_category = _Category;
-
-        using value_type = _Ty;
-        using pointer = _Ty *;
-        using reference = _Ty &;
-        using difference_type = _Distance;
-    };
-
-    template <class _Ty, class _Distance> struct input_iterator
-    {
-        using iterator_category = input_iterator_tag;
-
-        using value_type = _Ty;
-        using pointer = _Ty *;
-        using reference = _Ty &;
-        using difference_type = _Distance;
-    };
-
-    struct output_iterator
-    {
-        using iterator_category = output_iterator_tag;
-
-        using value_type = void;
-        using difference_type = void;
-        using pointer = void;
-        using reference = void;
-    };
-
-    ITERAOTR_TAG_DEFINE(forward_iterator, input_iterator);
-    ITERAOTR_TAG_DEFINE(bidirectional_iterator, forward_iterator);
-    ITERAOTR_TAG_DEFINE(random_access_iterator, bidirectional_iterator);
-
-    // iterator traits
-    template <class _Iterator> struct iterator_traits
-    {
-        using iterator_category = typename _Iterator::iterator_category;
-
-        using value_type = typename _Iterator::value_type;
-        using pointer = typename _Iterator::pointer;
-        using reference = typename _Iterator::reference;
-        using difference_type = typename _Iterator::difference_type;
-    };
-
-    template <class _Tp> struct iterator_traits<_Tp *>
-    {
-        using iterator_category = random_access_iterator_tag;
-
-        using value_type = _Tp;
-        using difference_type = ::std::ptrdiff_t;
-        using pointer = _Tp *;
-        using reference = _Tp &;
-    };
-
-    template <class _Tp> struct iterator_traits<const _Tp *>
-    {
-        using iterator_category = random_access_iterator_tag;
-
-        using value_type = _Tp;
-        using difference_type = ::std::ptrdiff_t;
-        using pointer = const _Tp *;
-        using reference = const _Tp &;
-    };
-
-    template <class I>
-    constexpr typename iterator_traits<I>::iterator_category
-    iterator_category(const I &)
-    {
-        using category = typename iterator_traits<I>::iterator_category;
-        return category();
-    }
-
-    template <class _Iterty>
-    using difference_type_t =
-        typename iterator_traits<_Iterty>::difference_type;
-
-    namespace util {
-        // is iterator xxx type
-        IS_ITERATOR_TAG_TOTAL(input_iterator_tag);
-        IS_ITERATOR_TAG_TOTAL(output_iterator_tag);
-        IS_ITERATOR_TAG_TOTAL(forward_iterator_tag);
-        IS_ITERATOR_TAG_TOTAL(bidirectional_iterator_tag);
-        IS_ITERATOR_TAG_TOTAL(random_access_iterator_tag);
-    }; // namespace util
-
     // Iterator Function
-
-    // distance
-    template <class _InputIterator, class _Distance>
-    inline void __distance(_InputIterator __first, _InputIterator __last,
-                           _Distance &__n, input_iterator_tag)
+    template <class InputIt>
+    inline auto distance(InputIt __first, InputIt __last)
     {
-        while (__first != __last) {
-            ++__first;
-            ++__n;
+        using category_type = iterator_category_t<InputIt>;
+        using type = difference_type_t<InputIt>;
+        type n = 0;
+
+        if constexpr (util::is_random_access_iterator_tag_v<category_type>) {
+            n = static_cast<type>(__last - __first);
         }
-    }
+        else if (util::is_input_iterator_tag_v<category_type>) {
+            while (__first != __last) {
+                ++__first;
+                ++n;
+            }
+        }
 
-    template <class _RandomAccessIterator, class _Distance>
-    inline void __distance(_RandomAccessIterator __first,
-                           _RandomAccessIterator __last, _Distance &__n,
-                           random_access_iterator_tag)
-    {
-        __n += __last - __first;
-    }
-
-    template <class _Iterator, class _Distance>
-    inline void distance(_Iterator __first, _Iterator __last, _Distance &__n)
-    {
-        __distance(__first, __last, __n, iterator_category(__first));
-    }
-
-    template <class _Iterator>
-    auto distance(_Iterator __first, _Iterator __last)
-    {
-        difference_type_t<_Iterator> n = 0;
-        __distance(__first, __last, n, iterator_category(__first));
+        // cppref: only random_access_iterator exist -count case.
         return n;
     }
 
-    // advance
-    template <class _Ty, class _IterDistance>
-    void __advance(_Ty &__i, _IterDistance __n, input_iterator_tag) NOEXCEPT
-    {}
-
-    template <class _IterStart, class _IterDistance>
-    void __advance(_IterStart &__i, _IterDistance __n,
-                   forward_iterator_tag) NOEXCEPT
+    template <class InputIt, class Distance>
+    constexpr void advance(InputIt &it, Distance n)
     {
-        while (--__n)
-            ++__i;
+        using category_type = iterator_category_t<InputIt>;
+        if constexpr (util::is_random_access_iterator_tag_v<category_type>) {
+            it += n;
+        }
+        else if (util::is_bidirectional_iterator_tag_v<category_type>) {
+            while (n > 0)
+                ++it, --n;
+            while (n < 0)
+                --it, ++n;
+        }
+        else if (util::is_forward_iterator_tag_v<category_type>) {
+            while (n > 0)
+                ++it, --n;
+        }
     }
 
-    template <class _Ty, class _IterDistance>
-    void __advance(_Ty &__i, _IterDistance __n,
-                   bidirectional_iterator_tag) NOEXCEPT
+    template <class InputIt>
+    constexpr InputIt next(InputIt it, difference_type_t<InputIt> n = 1)
     {
-        if (__n >= 0)
-            while (__n--)
-                ++__i;
-        else
-            while (__n++)
-                --__i;
+        advance(it, n);
+        return it;
     }
 
-    template <class _Ty, class _IterDistance>
-    void __advance(_Ty &__i, _IterDistance __n,
-                   random_access_iterator_tag) NOEXCEPT
+    template <class BidirIt>
+    constexpr auto prev(BidirIt it, difference_type_t<BidirIt> n = 1)
     {
-        __i += __n;
+        advance(it, -n);
+        return it;
     }
 
-    template <class _Ty, class _D> void advance(_Ty &__i, _D __n) NOEXCEPT
+    template <class BidirIt1, class BidirIt2>
+    BidirIt2 copy_backward(BidirIt1 first, BidirIt1 last, BidirIt2 d_last)
     {
-        __advance(__i, __n, iterator_category(__i));
-    }
+        using category_type = iterator_category_t<BidirIt1>;
+        using category2_type = iterator_category_t<BidirIt2>;
 
-    template <class _Ty, class _IterDistance>
-    _Ty next(_Ty __i, _IterDistance __n) NOEXCEPT
-    {
-        advance(__i, __n);
-        return __i;
-    }
+        if constexpr (util::is_bidirectional_iterator_tag_args_v<
+                          category_type, category2_type>) {
+            // cppref: BidirIt1/BidirIt2 -> [first, last)
+            while (last != first)
+                *(--d_last) = *(--last);
+        }
 
-    // copy_backward
-    template <class _Iter>
-    _Iter __copy_backward(_Iter __first, _Iter __last, _Iter __res,
-                          bidirectional_iterator_tag) NOEXCEPT
-    {
-        while (__last != __first)
-            *(--__res) = *(--__last);
-        return __res;
-    }
-
-    template <class _Iter, class _Distance>
-    _Iter __copy_backward(_Iter __first, _Iter __last, _Iter __res,
-                          random_access_iterator_tag) NOEXCEPT
-    {
-        for (_Distance __n = __last - __first; __n > 0; --__n)
-            *(--__res) = *(--__last);
-        return __res;
-    }
-
-    template <class _Iter>
-    _Iter copy_backward(_Iter __first, _Iter __last, _Iter __res) NOEXCEPT
-    {
-        return __copy_backward(__first, __last, __res,
-                               iterator_category(__first));
+        return d_last;
     }
 
     // construct_at     ——C++17 after.
     template <class _T, class _Tv>
-    constexpr _T *construct_at(_T *__ptr, const _Tv &__v)
-        NOEXCEPT(::std::is_nothrow_constructible_v<_T>)
+    constexpr _T *construct_at(_T *__ptr, const _Tv &__v = _Tv()) noexcept(
+        ::std::is_nothrow_constructible_v<_T>)
     {
-        return ::new (static_cast<void *>(__ptr)) _T(__v);
+        return ::new (Fiop::_Voidify_ptr(__ptr)) _T(__v);
     }
 
     template <class _T> constexpr _T *construct_at(_T *__ptr)
@@ -262,13 +99,14 @@ namespace iop {
     }
 
     template <class _T, class... _Args>
-    constexpr _T *construct_at(_T *__ptr, _Args &&...__args)
-        NOEXCEPT(::std::is_nothrow_constructible_v<_T>)
+    constexpr _T *construct_at(_T *__ptr, _Args &&...__args) noexcept(
+        ::std::is_nothrow_constructible_v<_T>)
     {
-        return ::new ((__ptr)) _T{Fiop::forward<_Args>(__args)...};
+        return ::new (Fiop::_Voidify_ptr(__ptr))
+            _T(Fiop::forward<_Args>(__args)...);
     }
 
-    // destory
+    // destroy
     template <class _T> constexpr void destroy_at(_T *__ptr)
     {
         if constexpr (mpls::is_array_v<_T>) {
@@ -283,6 +121,21 @@ namespace iop {
     {
         while (__first != __last)
             iop::destroy_at(::std::addressof(*(__first++)));
+    }
+
+    template <class _Iter> constexpr void destroy(_Iter __first, _Iter __last)
+    {
+        while (__first != __last)
+            iop::destroy_at(::std::addressof(*(__first++)));
+    }
+
+    template <class _ForwardIt, class _Size>
+    constexpr _ForwardIt destroy_n(_ForwardIt __first, _Size __n)
+    {
+        for (; __n > 0; --__n, ++__first)
+            iop::destroy_at(::std::addressof(*__first));
+
+        return __first;
     }
 
     // uninitialized(fill / copy / copy_n)
@@ -339,7 +192,6 @@ namespace iop {
             throw;
         }
     }
-
 }; // namespace iop
 
-#endif //*  _ITERATOR_BASE_IOP_
+#endif
