@@ -1,7 +1,7 @@
 CC       := g++
-CFLAGS   := -Wall -Werror -Wextra --pedantic --std=c++20 -Wno-unused -Wno-error=deprecated-copy
+CFLAGS   := -Wall -Werror -Wextra --pedantic --std=c++17 -Wno-unused -Wno-error=deprecated-copy
 
-SRC_DIR  := ./src/cpp2x/test
+SRC_DIR  := ./src/cpp17/test
 BUILD    := build/obj
 TARGET   := test
 

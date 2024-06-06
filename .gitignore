@@ -1,6 +1,8 @@
 /D
-/src/cpp17/coding.cc
-/src/cpp17/issue
+/include/cpp17/coding.cc
+/include/cpp17/md
+/include/cpp17/.vscode
+/stl_use_cpp
 /build
 *.md
 *.elf
