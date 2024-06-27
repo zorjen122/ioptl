@@ -1,33 +1,46 @@
 import os
-import sys
-import shutil
 
-Vflag = "-Wall -Werror -Wextra --pedantic --std=c++20 -Wno-unused -Wno-error=deprecated-copy"
-src_dir = "./src/cpp17/test/container_test/"
-target_dir = "./build/bin/"
+# ANSI color codes
+GREEN = '\033[92m'
+RESET = '\033[0m'
 
-def excu_test(move_flag = True):
-    for file in os.listdir(src_dir):
-        if file.endswith(".cpp"):
-            obj_file = f"{file[:-4]}.o"
-            complie_cmd = f"g++ {Vflag} -c {src_dir}/{file} -o {obj_file}"
-            test_cmd = f"g++ {Vflag} {src_dir}/{file} -o {file[:-4]}"
-            exe_file = f"{file[:-4]}"
-        
-          #excu: 
-            os.system(complie_cmd)
-            os.system(test_cmd)
-            os.remove(obj_file)
-            if move_flag:
-                os.remove(exe_file)
-            else:
-                if not os.path.exists():
-                    os.mkdir(target_dir)
-                shutil.move(exe_file,os.path.join(target_dir,exe_file))
+def compile_cpp_files_in_directory(directory):
+    # Define the C++ compiler and flags
+    CC = 'g++'
+    CFLAGS = '--std=c++17'
+    
+    # Get current script directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    print("Compilation and testing complate")
+    # Construct full path to target directory
+    full_directory = os.path.join(script_dir, 'include/cpp17/test', directory)
+    
+    # Get all .cpp files in the directory
+    cpp_files = [file for file in os.listdir(full_directory) if file.endswith('.cpp')]
+    
+
+    # Prepare compile command
+    print(f"{GREEN}###########-Compiling {directory}...{RESET}")
+    for i in range(0, len(cpp_files)):
+        compile_command = f"{CC} {CFLAGS} {full_directory}/{cpp_files[i]} -o a.out"
+        os.system(compile_command)        
+        print(f"{GREEN} -Test [{cpp_files[i]}] successful.{RESET}")
+    os.system(f"rm a.out")
+    print(f"{GREEN}###########-Compilation completed for {directory}.{RESET}\n")
+    
+
+def compile_all_test_directories():
+    test_dirs = [
+        'allocator_test',
+        'container_test',
+        'impl_test',
+        'iterator_test',
+        'util_test',
+    ]
+    
+    # Compile each test directory
+    for test_dir in test_dirs:
+        compile_cpp_files_in_directory(test_dir)
 
 if __name__ == "__main__":
-    move_file = len(sys.argv) > 1 and sys.argv[1] == "w"
-    excu_test(move_file);
-
+    compile_all_test_directories()

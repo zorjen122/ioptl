@@ -33,7 +33,7 @@ namespace iop {
     class list_iterator_base
     {
       public:
-        using iterator_category = bidirectional_iterator_tag;
+        using iterator_category = iop::bidirectional_iterator_tag;
         using size_type = size_t;
         using difference_type = ::std::ptrdiff_t;
 
@@ -118,8 +118,9 @@ namespace iop {
       protected:
         using allocator_type = _Alloc;
         using allocator_traits_type = allocator_traits<_Alloc>;
-        using allocator_node_type = typename allocator_traits_type::template 
-                                rebind_alloc<__list_node<_Ty>>::other;
+        using allocator_node_type =
+            typename allocator_traits_type::template rebind_alloc<
+                __list_node<_Ty>>::other;
         using node_T = __list_node<_Ty>;
         using const_node = __list_node<const _Ty>;
 
@@ -145,7 +146,6 @@ namespace iop {
 
             for (size_type i = 0; i < __sz - 1; ++i)
                 push_back(__v);
-                
         }
 
         explicit list(const list &__res) noexcept
@@ -207,7 +207,10 @@ namespace iop {
         }
 
       public:
-        allocator_node_type get_allocator() noexcept { return allocator_node_type(); }
+        allocator_node_type get_allocator() noexcept
+        {
+            return allocator_node_type();
+        }
 
         void clear()
         {
@@ -488,8 +491,8 @@ namespace iop {
 
         void resize(size_type __n) { resize(__n, _Ty()); }
 
-        void assign(size_type count, const_reference value)
-            noexcept(noexcept(!empty()))
+        void assign(size_type count,
+                    const_reference value) noexcept(noexcept(!empty()))
         {
             iterator it = begin();
 
@@ -509,10 +512,12 @@ namespace iop {
             }
         }
 
-        template <class InputIt> void assign(InputIt first, InputIt last)
+        template <class InputIt,
+                  class = mpls::enable_if_t<!mpls::is_integral_v<InputIt>>>
+        void assign(InputIt first, InputIt last)
         {
             iterator it = begin();
-            size_type d = distance(first, last);
+            size_type d = iop::distance(first, last);
 
             if (d >= size()) {
                 while (it != end())

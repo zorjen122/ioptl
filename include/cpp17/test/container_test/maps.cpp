@@ -61,7 +61,6 @@ void multimap_test()
     cout << sf << "\n";
 }
 
-
 int main()
 {
     map_test();

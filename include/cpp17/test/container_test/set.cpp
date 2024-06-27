@@ -12,7 +12,7 @@ void set_test()
         sf.insert(i);
     }
 
-    cout << sf << "\n";
+    test::__FormatCout::print(sf);
 }
 
 void multiset_test()
@@ -23,17 +23,15 @@ void multiset_test()
         sf.insert(i);
     }
 
-    cout << sf << "\n";
+    test::__FormatCout::print(sf);
 }
 
 int main()
 {
-    cout << "set_test: "
-         << "\n";
+    cout << "set_test: " << "\n";
     set_test();
 
-    cout << "multiset_test: "
-         << "\n";
+    cout << "multiset_test: " << "\n";
     multiset_test();
     return 0;
 }

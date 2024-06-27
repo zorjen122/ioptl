@@ -1,6 +1,6 @@
 #include "../../container/vectorF.h"
-#include "../../util/iterator_baseF.h"
 #include "../../traits/type_traitsF.h"
+#include "../../util/iterator_baseF.h"
 
 #include <iostream>
 using namespace std;
@@ -16,10 +16,7 @@ struct S
         ::std::cout << "S::S();\n";
     }
 
-    ~S()
-    {
-        ::std::cout << "S::~S();\n";
-    }
+    ~S() { ::std::cout << "S::~S();\n"; }
 
     void print() const
     {
@@ -31,7 +28,8 @@ void ConstructFunc()
 {
     alignas(S) unsigned char storage[sizeof(S)];
 
-    S *ptr = iop::construct_at(reinterpret_cast<S *>(storage), 42, 2.71828f, 3.1415);
+    S *ptr =
+        iop::construct_at(reinterpret_cast<S *>(storage), 42, 2.71828f, 3.1415);
     ptr->print();
 
     iop::destroy_at(ptr);
@@ -43,12 +41,12 @@ void UninitcopyFunc()
 
     auto sz = ::std::size(v);
 
-    if (void *pbuf = ::std::aligned_alloc(alignof(::std::string), sizeof(::std::string) * sz))
-    {
-        try
-        {
+    if (void *pbuf = ::std::aligned_alloc(alignof(::std::string),
+                                          sizeof(::std::string) * sz)) {
+        try {
             auto first = static_cast<::std::string *>(pbuf);
-            auto last = iop::uninitialized_copy(::std::begin(v), ::std::end(v), first);
+            auto last =
+                iop::uninitialized_copy(::std::begin(v), ::std::end(v), first);
 
             for (auto it = first; it != last; ++it)
                 ::std::cout << *it << '_';
@@ -56,8 +54,7 @@ void UninitcopyFunc()
 
             iop::destroy_at(first, last);
         }
-        catch (...)
-        {
+        catch (...) {
         }
         ::std::free(pbuf);
     }
@@ -72,8 +69,7 @@ void uninitcopyN()
     iop::uninitialized_copy_n(source.begin(), 3, destination.begin());
 
     std::cout << "Copied elements: ";
-    for (const auto &element : destination)
-    {
+    for (const auto &element : destination) {
         std::cout << element << " ";
     }
     std::cout << std::endl;
@@ -87,12 +83,11 @@ int main(int arcc, char *argv[])
     using alloc_type = iop::allocator<int>;
     alloc_type __alloc;
 
-    iter::trivial_iterator<int *> ptr = __alloc.allocate(10);
+    iop::vec_iter::trivial_iterator<int> ptr = __alloc.allocate(10);
 
     ptr = __alloc.allocate(10);
 
-    for (int i = 0; i < 10; ++i)
-    {
+    for (int i = 0; i < 10; ++i) {
         *(ptr + i) = i;
     }
 

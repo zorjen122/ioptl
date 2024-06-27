@@ -12,10 +12,10 @@
 #include "../traits/allocator_traitsF.h"
 #include "../util/utilityF.h"
 
-#include "../util/exceptionF.h"
 #include "../iteratorF.h"
+#include "../util/exceptionF.h"
 
-#include <initializer_list>     // std::initializer_list
+#include <initializer_list> // std::initializer_list
 
 #define _OPERATOR_THAN(op)                                                     \
     constexpr bool operator op(array &__rhs)                                   \
@@ -125,9 +125,8 @@ namespace iop {
             }
         }
 
-        constexpr void swap(array &__rhs)
-            noexcept(noexcept(::std::swap(::std::declval<reference>(),
-                                          ::std::declval<reference>())))
+        constexpr void swap(array &__rhs) noexcept(noexcept(::std::swap(
+            ::std::declval<reference>(), ::std::declval<reference>())))
         {
             iterator it = this->begin();
             iterator rit = __rhs.begin();
@@ -145,21 +144,12 @@ namespace iop {
                 return *(_Varray + __idx + 1);
         }
 
-        constexpr bool empty() noexcept
-        {
-            return (_Varray == nullptr);
-        }
-        constexpr const_reference data() noexcept { return *_Varray; }
+        constexpr bool empty() noexcept { return (_Varray == nullptr); }
+        constexpr const_pointer data() noexcept { return _Varray; }
 
         constexpr size_type size() noexcept { return _len; }
-        constexpr const size_type size() const noexcept
-        {
-            return _len;
-        }
-        constexpr size_type max_size() noexcept
-        {
-            return size_type(-1);
-        }
+        constexpr const size_type size() const noexcept { return _len; }
+        constexpr size_type max_size() noexcept { return size_type(-1); }
         constexpr const size_type max_size() const noexcept
         {
             return size_type(-1);
@@ -185,8 +175,7 @@ namespace iop {
             return *(_Varray + __idx);
         }
 
-        constexpr const_reference
-        operator[](size_type __idx) const noexcept
+        constexpr const_reference operator[](size_type __idx) const noexcept
         {
             return *(_Varray + __idx);
         }
