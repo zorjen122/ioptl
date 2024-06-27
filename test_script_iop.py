@@ -24,6 +24,7 @@ def compile_cpp_files_in_directory(directory):
         compile_command = f"{CC} {CFLAGS} {full_directory}/{cpp_files[i]} -o a.out"
         os.system(compile_command)        
         print(f"{GREEN} -Test [{cpp_files[i]}] successful.{RESET}")
+        
     os.system(f"rm a.out")
     print(f"{GREEN}###########-Compilation completed for {directory}.{RESET}\n")
     
