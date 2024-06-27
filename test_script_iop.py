@@ -18,7 +18,6 @@ def compile_cpp_files_in_directory(directory):
     # Get all .cpp files in the directory
     cpp_files = [file for file in os.listdir(full_directory) if file.endswith('.cpp')]
     
-
     # Prepare compile command
     print(f"{GREEN}###########-Compiling {directory}...{RESET}")
     for i in range(0, len(cpp_files)):
